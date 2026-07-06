@@ -7,6 +7,8 @@ if (!isset($_SESSION['user_id'])) {
 require '../../config/database.php';
 
 $total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active = 1")->fetchColumn();
+$pregnant_count = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk')")->fetchColumn();
+$infant_count = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,8 +28,8 @@ $total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active =
   </div>
   <div class="row g-3">
     <div class="col-md-3"><div class="card p-3 text-center"><h5>Total residents</h5><p class="fs-3 mb-0"><?= $total_residents ?></p></div></div>
-    <div class="col-md-3"><div class="card p-3 text-center"><h5>Pregnant women</h5><p class="fs-3 mb-0">--</p></div></div>
-    <div class="col-md-3"><div class="card p-3 text-center"><h5>Infants 0-12mo</h5><p class="fs-3 mb-0">--</p></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center"><h5>Pregnant women</h5><p class="fs-3 mb-0"><?= $pregnant_count ?></p></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center"><h5>Infants 0-12mo</h5><p class="fs-3 mb-0"><?= $infant_count ?></p></div></div>
     <div class="col-md-3"><div class="card p-3 text-center"><h5>Disease cases</h5><p class="fs-3 mb-0">--</p></div></div>
   </div>
   <div class="mt-4">

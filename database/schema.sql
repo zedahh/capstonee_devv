@@ -120,3 +120,22 @@ CREATE TABLE IF NOT EXISTS vaccination_records (
     FOREIGN KEY (infant_record_id) REFERENCES infant_records(infant_record_id),
     FOREIGN KEY (administered_by) REFERENCES users(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+-- Disease and Illness Case Recording (Chapter 3, Figure 3.22)
+CREATE TABLE IF NOT EXISTS disease_cases (
+    case_id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    resident_id       INT UNSIGNED NOT NULL,
+    disease_name      VARCHAR(100) NOT NULL,
+    date_reported     DATE NOT NULL,
+    status            ENUM('Active', 'Under monitoring', 'Recovered') NOT NULL DEFAULT 'Active',
+    notes             TEXT NULL,
+    recorded_by       INT UNSIGNED NULL,
+    created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (resident_id) REFERENCES residents(resident_id),
+    FOREIGN KEY (recorded_by) REFERENCES users(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX idx_disease_name_date ON disease_cases (disease_name, date_reported);

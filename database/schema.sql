@@ -139,3 +139,16 @@ CREATE TABLE IF NOT EXISTS disease_cases (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_disease_name_date ON disease_cases (disease_name, date_reported);
+
+
+-- Public Announcement Management (Chapter 3)
+CREATE TABLE IF NOT EXISTS announcements (
+    announcement_id   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title              VARCHAR(150) NOT NULL,
+    content            TEXT NOT NULL,
+    target_purok       VARCHAR(20) NOT NULL DEFAULT 'All',
+    is_active          TINYINT(1) NOT NULL DEFAULT 1,
+    posted_by          INT UNSIGNED NULL,
+    created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (posted_by) REFERENCES users(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

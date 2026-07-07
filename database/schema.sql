@@ -192,3 +192,53 @@ INSERT INTO epi_schedule (vaccine_name, recommended_age_weeks, grace_period_week
 ('OPV 3', 14, 2),
 ('PCV 3', 14, 2),
 ('Measles/MMR', 39, 4);
+
+
+
+-- DOH-recommended prenatal visit schedule, counted in weeks from LMP
+CREATE TABLE IF NOT EXISTS prenatal_visit_schedule (
+    schedule_id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    trimester           TINYINT UNSIGNED NOT NULL,
+    start_week          TINYINT UNSIGNED NOT NULL,
+    end_week            TINYINT UNSIGNED NOT NULL,
+    min_visits          TINYINT UNSIGNED NOT NULL,
+    grace_period_weeks  TINYINT UNSIGNED NOT NULL DEFAULT 2
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO prenatal_visit_schedule (trimester, start_week, end_week, min_visits, grace_period_weeks) VALUES
+(1, 1, 13, 1, 2),
+(2, 14, 27, 1, 2),
+(3, 28, 40, 2, 2);
+
+
+-- Login attempt tracking, for basic rate-limiting
+CREATE TABLE IF NOT EXISTS login_attempts (
+    attempt_id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    username        VARCHAR(50) NOT NULL,
+    failed_count    TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    locked_until    DATETIME NULL,
+    last_attempt_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- LGU/barangay office contact numbers, for SMS notification
+CREATE TABLE IF NOT EXISTS lgu_contacts (
+    contact_id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    contact_name    VARCHAR(100) NOT NULL,
+    designation     VARCHAR(100) NULL,
+    phone_number    VARCHAR(20) NOT NULL,
+    is_active       TINYINT(1) NOT NULL DEFAULT 1,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Log of every SMS attempt (simulated for now, real once an API key is added)
+CREATE TABLE IF NOT EXISTS sms_log (
+    sms_log_id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    phone_number    VARCHAR(20) NOT NULL,
+    message         TEXT NOT NULL,
+    purpose         VARCHAR(50) NOT NULL COMMENT 'lgu_alert or resident_announcement',
+    status          VARCHAR(20) NOT NULL DEFAULT 'simulated',
+    sent_by         INT UNSIGNED NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sent_by) REFERENCES users(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

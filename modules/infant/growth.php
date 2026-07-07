@@ -31,8 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $height_cm = $_POST['height_cm'] ?: null;
     $notes = trim($_POST['notes'] ?? '');
 
-    if ($visit_date === '' || $weight_kg === '') {
+   if ($visit_date === '' || $weight_kg === '') {
         $error = 'Visit date and weight are required.';
+    } elseif ($weight_kg < 0.5 || $weight_kg > 15) {
+        $error = 'Weight should realistically be between 0.5 kg and 15 kg for an infant. Please check the value entered.';
+    } elseif ($height_cm !== null && $height_cm !== '' && ($height_cm < 25 || $height_cm > 90)) {
+        $error = 'Height should realistically be between 25 cm and 90 cm for an infant. Please check the value entered.';
     } else {
         $stmt = $pdo->prepare("INSERT INTO growth_monitoring 
             (infant_record_id, visit_date, weight_kg, height_cm, notes, recorded_by)

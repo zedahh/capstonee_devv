@@ -23,8 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $birth_length_cm = $_POST['birth_length_cm'] ?: null;
     $monitoring_status = $_POST['monitoring_status'] ?? 'Normal';
 
-    if ($first_name === '' || $last_name === '' || $birth_date === '' || $gender === '' || $purok === '') {
+   if ($first_name === '' || $last_name === '' || $birth_date === '' || $gender === '' || $purok === '') {
         $error = 'Please fill in all required fields.';
+    } elseif ($birth_weight_kg !== null && $birth_weight_kg !== '' && ($birth_weight_kg < 0.3 || $birth_weight_kg > 7)) {
+        $error = 'Birth weight should realistically be between 0.3 kg and 7 kg. Please check the value entered.';
+    } elseif ($birth_length_cm !== null && $birth_length_cm !== '' && ($birth_length_cm < 25 || $birth_length_cm > 60)) {
+        $error = 'Birth length should realistically be between 25 cm and 60 cm. Please check the value entered.';
     } else {
         // Step 1: create the resident record for this infant
         $qr_code = uniqid('RES-', true);

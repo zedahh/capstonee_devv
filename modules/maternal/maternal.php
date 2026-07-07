@@ -5,11 +5,12 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 require '../../config/database.php';
+require '../../includes/functions.php';
+$prenatal_schedule = $pdo->query("SELECT * FROM prenatal_visit_schedule")->fetchAll(PDO::FETCH_ASSOC);
 
 $error = '';
 $success = '';
 
-// Handle new maternal record
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $resident_id = $_POST['resident_id'] ?? '';
     $lmp_date = $_POST['lmp_date'] ?: null;
@@ -35,10 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Dropdown: female residents only
 $female_residents = $pdo->query("SELECT resident_id, first_name, last_name, purok FROM residents WHERE gender = 'Female' AND is_active = 1 ORDER BY last_name")->fetchAll(PDO::FETCH_ASSOC);
 
-// List all maternal records, joined with resident info
 $records = $pdo->query("
     SELECT maternal_records.*, residents.first_name, residents.last_name, residents.purok
     FROM maternal_records
@@ -116,17 +115,18 @@ $records = $pdo->query("
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>Name</th><th>Purok</th><th>LMP</th><th>EDD</th><th>Status</th><th>Actions</th>
+        <th>Name</th><th>Purok</th><th>LMP</th><th>EDD</th><th>Status</th><th>Visit compliance</th><th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <?php foreach ($records as $rec): ?>
+      <?php foreach ($records as $rec): $compliance = getPrenatalComplianceStatus($pdo, $rec['maternal_record_id'], $rec['lmp_date'], $rec['monitoring_status'], $prenatal_schedule); ?>
       <tr>
         <td><?= htmlspecialchars($rec['last_name'] . ', ' . $rec['first_name']) ?></td>
         <td>Purok <?= htmlspecialchars($rec['purok']) ?></td>
         <td><?= htmlspecialchars($rec['lmp_date']) ?></td>
         <td><?= htmlspecialchars($rec['edd_date']) ?></td>
         <td><?= htmlspecialchars($rec['monitoring_status']) ?></td>
+        <td><span class="badge bg-<?= $compliance['badge'] ?>"><?= htmlspecialchars($compliance['label']) ?></span></td>
         <td><a href="checkups.php?id=<?= $rec['maternal_record_id'] ?>" class="btn btn-sm btn-outline-primary">View checkups</a></td>
       </tr>
       <?php endforeach; ?>
@@ -135,7 +135,6 @@ $records = $pdo->query("
 </div>
 
 <script>
-// Auto-suggest EDD as LMP + 280 days (still editable, since real EDD may come from ultrasound)
 document.getElementById('lmp_date').addEventListener('change', function() {
     if (this.value && !document.getElementById('edd_date').value) {
         const lmp = new Date(this.value);

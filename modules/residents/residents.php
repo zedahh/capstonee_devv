@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $success = 'Resident updated successfully.';
     } else {
-        $qr_code = uniqid('RES-', true);
+        $qr_code = 'RES-' . bin2hex(random_bytes(12));
         $stmt = $pdo->prepare("INSERT INTO residents 
             (qr_code, first_name, middle_name, last_name, suffix, birth_date, gender, purok, address_line, contact_number)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -148,6 +148,8 @@ $residents = $pdo->query("SELECT * FROM residents WHERE is_active = 1 ORDER BY l
     </div>
   </div>
 
+<input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Type to search by name...">
+
   <h5>All residents</h5>
   <table class="table table-striped">
     <thead>
@@ -165,7 +167,7 @@ $residents = $pdo->query("SELECT * FROM residents WHERE is_active = 1 ORDER BY l
         <td><?= htmlspecialchars($r['contact_number']) ?></td>
         <td>
           <button type="button" class="btn btn-sm btn-outline-success"
-            onclick="showQr('<?= htmlspecialchars($r['qr_code']) ?>', '<?= htmlspecialchars($r['first_name'] . ' ' . $r['last_name']) ?>')">View QR</button>
+          onclick="showQr('<?= htmlspecialchars($r['qr_code']) ?>', '<?= htmlspecialchars($r['first_name'] . ' ' . $r['last_name']) ?>')">View QR</button>
           <a href="?edit=<?= $r['resident_id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
           <a href="?delete=<?= $r['resident_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Deactivate this resident?')">Delete</a>
         </td>
@@ -207,6 +209,16 @@ function showQr(code, name) {
     }
     qrModalInstance.show();
 }
+</script>
+<script>
+document.getElementById('liveSearch').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll('table tbody tr');
+    rows.forEach(function(row) {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+    });
+});
 </script>
 </body>
 </html>

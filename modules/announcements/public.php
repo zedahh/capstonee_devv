@@ -18,6 +18,7 @@ $announcements = $pdo->query("
 <body class="bg-light">
 <div class="container py-5">
   <h2 class="mb-4 text-center">Barangay Santa Ines Health Announcements</h2>
+  <p class="text-center mb-4"><a href="../residents/my_record.php">Check your own health record</a></p>
   <?php if (empty($announcements)): ?>
     <p class="text-center text-muted">No announcements at this time.</p>
   <?php endif; ?>

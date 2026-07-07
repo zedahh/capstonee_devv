@@ -8,6 +8,17 @@ require '../../config/database.php';
 
 require '../../includes/functions.php';
 
+// Count maternal records currently behind on prenatal visit compliance
+$prenatal_schedule = $pdo->query("SELECT * FROM prenatal_visit_schedule")->fetchAll(PDO::FETCH_ASSOC);
+$maternal_for_compliance = $pdo->query("SELECT maternal_record_id, lmp_date, monitoring_status FROM maternal_records")->fetchAll(PDO::FETCH_ASSOC);
+
+$behind_maternal_count = 0;
+foreach ($maternal_for_compliance as $mat) {
+    $compliance = getPrenatalComplianceStatus($pdo, $mat['maternal_record_id'], $mat['lmp_date'], $mat['monitoring_status'], $prenatal_schedule);
+    if ($compliance['behind']) {
+        $behind_maternal_count++;
+    }
+}
 // Count infants currently overdue on their DOH EPI vaccination schedule
 $epi_schedule = $pdo->query("SELECT * FROM epi_schedule")->fetchAll(PDO::FETCH_ASSOC);
 $infants_for_fic = $pdo->query("
@@ -101,18 +112,33 @@ function getTrendInfo($months) {
     <div>
       <?php if ($_SESSION['role'] === 'administrator'): ?>
         <a href="../admin/audit_log.php" class="btn btn-outline-secondary btn-sm me-2">Audit log</a>
+        <a href="../admin/lgu_contacts.php" class="btn btn-outline-secondary btn-sm me-2">LGU Contacts</a>
       <?php endif; ?>
       <a href="../auth/logout.php" class="btn btn-outline-danger btn-sm">Log out</a>
     </div>
   </div>
 
-  <?php foreach ($threshold_alerts as $alert): $level = getRiskLevel($alert['case_count']); ?>
+  <?php if (isset($_GET['sms_sent'])): ?>
+  <div class="alert alert-success"><?= (int) $_GET['sms_sent'] ?> SMS notification(s) sent to LGU contacts (simulated).</div>
+  <?php endif; ?>
+  
+ <?php foreach ($threshold_alerts as $alert): $level = getRiskLevel($alert['case_count']); ?>
     <?php if ($level === 'high' || $level === 'moderate'): ?>
+    <?php
+      $draft_title = "Health Advisory: " . $alert['disease_name'] . " Alert in Purok " . $alert['purok'];
+      $draft_content = "The health center has recorded " . $alert['case_count'] . " active " . $alert['disease_name'] . " case(s) in Purok " . $alert['purok'] . ", exceeding the alert threshold. Residents are advised to take necessary precautions. Please contact the health center for more information.";
+    ?>
     <div class="alert <?= $level === 'high' ? 'alert-danger' : 'alert-warning' ?>">
       <strong>Active alert: Purok <?= htmlspecialchars($alert['purok']) ?></strong> —
       <?= htmlspecialchars($alert['disease_name']) ?> cases have reached <?= $level ?> risk level
       (<?= $alert['case_count'] ?> active cases) — exceeds the configured threshold.
-      <a href="../heatmap/heatmap.php">View heatmap</a>
+    <a href="../heatmap/heatmap.php">View heatmap</a>
+      ·
+      <a href="../announcements/announcements.php?draft_title=<?= urlencode($draft_title) ?>&draft_content=<?= urlencode($draft_content) ?>&draft_purok=<?= urlencode($alert['purok']) ?>">Draft public advisory</a>
+      ·
+      <a href="../reports/lgu_briefing.php?purok=<?= urlencode($alert['purok']) ?>&disease=<?= urlencode($alert['disease_name']) ?>&count=<?= urlencode($alert['case_count']) ?>" target="_blank">Generate LGU briefing (PDF)</a>
+      ·
+      <a href="../admin/notify_lgu.php?purok=<?= urlencode($alert['purok']) ?>&disease=<?= urlencode($alert['disease_name']) ?>&count=<?= urlencode($alert['case_count']) ?>" onclick="return confirm('Send SMS notification to all LGU contacts?')">Notify LGU via SMS</a>
     </div>
     <?php endif; ?>
   <?php endforeach; ?>
@@ -122,6 +148,13 @@ function getTrendInfo($months) {
   <div class="alert alert-warning">
     <strong><?= $overdue_infant_count ?> infant<?= $overdue_infant_count > 1 ? 's' : '' ?> overdue</strong> for DOH EPI vaccinations.
     <a href="../infant/infant.php">View infant monitoring</a>
+  </div>
+  <?php endif; ?>
+
+  <?php if ($behind_maternal_count > 0): ?>
+  <div class="alert alert-warning">
+    <strong><?= $behind_maternal_count ?> pregnant resident<?= $behind_maternal_count > 1 ? 's' : '' ?> behind</strong> on prenatal visit schedule.
+    <a href="../maternal/maternal.php">View maternal health</a>
   </div>
   <?php endif; ?>
 

@@ -72,9 +72,10 @@ function getPrenatalComplianceStatus($pdo, $maternal_record_id, $lmp_date, $moni
 
 
 function sendSms($pdo, $phone_number, $message, $purpose, $user_id) {
-    // SIMULATED SEND — no real API call yet. Once a Semaphore API key is added,
-    // replace the inside of this function with a real cURL call to Semaphore's API,
-    // keeping the same function name/parameters so nothing else needs to change.
+    // SIMULATED SEND — logs to sms_log as if sent, no real API call.
+    // At deployment, replace the body of this function with a real call to
+    // Semaphore's API (https://semaphore.co/api/v4/messages), keeping the same
+    // function name and parameters so nothing else in the system needs to change.
 
     $stmt = $pdo->prepare("INSERT INTO sms_log (phone_number, message, purpose, status, sent_by) VALUES (?, ?, ?, 'simulated', ?)");
     $stmt->execute([$phone_number, $message, $purpose, $user_id]);

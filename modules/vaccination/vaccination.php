@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$epi_vaccines = $pdo->query("SELECT vaccine_name FROM epi_schedule ORDER BY recommended_age_weeks")->fetchAll(PDO::FETCH_COLUMN);
 // Dropdown: all infants
 $infants = $pdo->query("
     SELECT infant_records.infant_record_id, r.first_name, r.last_name, r.purok
@@ -39,6 +40,7 @@ $infants = $pdo->query("
     JOIN residents r ON infant_records.resident_id = r.resident_id
     ORDER BY r.last_name
 ")->fetchAll(PDO::FETCH_ASSOC);
+
 
 // List all vaccination records, joined with infant + health worker info
 $records = $pdo->query("
@@ -83,7 +85,12 @@ $records = $pdo->query("
           </div>
           <div class="col-md-4">
             <label class="form-label">Vaccine name</label>
-            <input type="text" name="vaccine_name" class="form-control" required placeholder="e.g. BCG, Hepatitis B, Penta 1">
+            <select name="vaccine_name" class="form-select" required>
+              <option value="">Select vaccine</option>
+              <?php foreach ($epi_vaccines as $v): ?>
+                <option value="<?= htmlspecialchars($v) ?>"><?= htmlspecialchars($v) ?></option>
+              <?php endforeach; ?>
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label">Date administered</label>

@@ -54,6 +54,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Dropdown: female residents, to optionally link as mother
 $mothers = $pdo->query("SELECT resident_id, first_name, last_name FROM residents WHERE gender = 'Female' AND is_active = 1 ORDER BY last_name")->fetchAll(PDO::FETCH_ASSOC);
 
+
+// Fully Immunized Child (FIC) status check against the DOH EPI schedule
+$epi_schedule = $pdo->query("SELECT * FROM epi_schedule")->fetchAll(PDO::FETCH_ASSOC);
+
+function getFicStatus($pdo, $infant_record_id, $birth_date, $epi_schedule) {
+    $age_weeks = floor((time() - strtotime($birth_date)) / (7 * 24 * 60 * 60));
+
+    $given = $pdo->prepare("SELECT vaccine_name FROM vaccination_records WHERE infant_record_id = ?");
+    $given->execute([$infant_record_id]);
+    $given_vaccines = $given->fetchAll(PDO::FETCH_COLUMN);
+
+    $overdue_count = 0;
+    $total_due_count = 0;
+
+    foreach ($epi_schedule as $vaccine) {
+        $due_at = $vaccine['recommended_age_weeks'] + $vaccine['grace_period_weeks'];
+        if ($age_weeks >= $vaccine['recommended_age_weeks']) {
+            $total_due_count++;
+            if (!in_array($vaccine['vaccine_name'], $given_vaccines) && $age_weeks > $due_at) {
+                $overdue_count++;
+            }
+        }
+    }
+
+    if ($overdue_count > 0) {
+        return ['label' => "Overdue ($overdue_count)", 'badge' => 'danger'];
+    } elseif ($total_due_count > 0 && count($given_vaccines) >= $total_due_count) {
+        return ['label' => 'Complete for age', 'badge' => 'success'];
+   } elseif ($total_due_count > 0) {
+        return ['label' => 'In progress', 'badge' => 'secondary'];
+    }
+    return ['label' => 'Too young for schedule', 'badge' => 'secondary'];
+}
+
 // List all infants with resident + mother info
 $infants = $pdo->query("
     SELECT infant_records.*, r.first_name, r.last_name, r.birth_date, r.purok,
@@ -157,16 +191,17 @@ $infants = $pdo->query("
   <h5>All infants (0–12 months)</h5>
   <table class="table table-striped">
     <thead>
-      <tr><th>Name</th><th>Birth date</th><th>Purok</th><th>Mother</th><th>Status</th><th>Actions</th></tr>
+      <tr><th>Name</th><th>Birth date</th><th>Purok</th><th>Mother</th><th>Status</th><th>FIC status</th><th>Actions</th></tr>
     </thead>
     <tbody>
-      <?php foreach ($infants as $i): ?>
+      <?php foreach ($infants as $i): $fic = getFicStatus($pdo, $i['infant_record_id'], $i['birth_date'], $epi_schedule); ?>
       <tr>
         <td><?= htmlspecialchars($i['last_name'] . ', ' . $i['first_name']) ?></td>
         <td><?= htmlspecialchars($i['birth_date']) ?></td>
         <td>Purok <?= htmlspecialchars($i['purok']) ?></td>
         <td><?= $i['mother_last'] ? htmlspecialchars($i['mother_last'] . ', ' . $i['mother_first']) : '—' ?></td>
         <td><?= htmlspecialchars($i['monitoring_status']) ?></td>
+        <td><span class="badge bg-<?= $fic['badge'] ?>"><?= htmlspecialchars($fic['label']) ?></span></td>
         <td><a href="growth.php?id=<?= $i['infant_record_id'] ?>" class="btn btn-sm btn-outline-primary">Growth records</a></td>
       </tr>
       <?php endforeach; ?>

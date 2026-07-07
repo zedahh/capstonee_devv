@@ -152,3 +152,43 @@ CREATE TABLE IF NOT EXISTS announcements (
     created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (posted_by) REFERENCES users(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+-- Seasonal disease risk reference (rule-based prediction basis)
+CREATE TABLE IF NOT EXISTS seasonal_risk_reference (
+    reference_id     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    disease_name     VARCHAR(100) NOT NULL,
+    start_month       TINYINT UNSIGNED NOT NULL COMMENT '1-12',
+    end_month         TINYINT UNSIGNED NOT NULL COMMENT '1-12',
+    advisory_note     TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO seasonal_risk_reference (disease_name, start_month, end_month, advisory_note) VALUES
+('Dengue', 6, 10, 'Rainy season historically shows elevated dengue risk. Monitor stagnant water sources and encourage larvae source reduction.'),
+('Diarrhea', 3, 5, 'Dry/hot season historically shows elevated diarrheal disease risk. Reinforce safe drinking water and food hygiene practices.');
+
+
+
+-- DOH Expanded Program on Immunization (EPI) schedule reference
+-- Ages in weeks from birth. Confirm exact ages/grace periods with the health center.
+CREATE TABLE IF NOT EXISTS epi_schedule (
+    schedule_id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    vaccine_name            VARCHAR(100) NOT NULL,
+    recommended_age_weeks   TINYINT UNSIGNED NOT NULL,
+    grace_period_weeks      TINYINT UNSIGNED NOT NULL DEFAULT 2
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO epi_schedule (vaccine_name, recommended_age_weeks, grace_period_weeks) VALUES
+('BCG', 0, 4),
+('Hepatitis B (birth dose)', 0, 4),
+('Pentavalent 1', 6, 2),
+('OPV 1', 6, 2),
+('PCV 1', 6, 2),
+('Pentavalent 2', 10, 2),
+('OPV 2', 10, 2),
+('PCV 2', 10, 2),
+('Pentavalent 3', 14, 2),
+('OPV 3', 14, 2),
+('PCV 3', 14, 2),
+('Measles/MMR', 39, 4);

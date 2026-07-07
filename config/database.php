@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Asia/Manila');
 // Database connection settings
 $host = 'localhost';
 $db_name = 'barangay_healthcenter_db';

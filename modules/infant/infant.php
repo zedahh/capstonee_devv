@@ -55,38 +55,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $mothers = $pdo->query("SELECT resident_id, first_name, last_name FROM residents WHERE gender = 'Female' AND is_active = 1 ORDER BY last_name")->fetchAll(PDO::FETCH_ASSOC);
 
 
+
+require '../../includes/functions.php';
+
 // Fully Immunized Child (FIC) status check against the DOH EPI schedule
 $epi_schedule = $pdo->query("SELECT * FROM epi_schedule")->fetchAll(PDO::FETCH_ASSOC);
 
-function getFicStatus($pdo, $infant_record_id, $birth_date, $epi_schedule) {
-    $age_weeks = floor((time() - strtotime($birth_date)) / (7 * 24 * 60 * 60));
-
-    $given = $pdo->prepare("SELECT vaccine_name FROM vaccination_records WHERE infant_record_id = ?");
-    $given->execute([$infant_record_id]);
-    $given_vaccines = $given->fetchAll(PDO::FETCH_COLUMN);
-
-    $overdue_count = 0;
-    $total_due_count = 0;
-
-    foreach ($epi_schedule as $vaccine) {
-        $due_at = $vaccine['recommended_age_weeks'] + $vaccine['grace_period_weeks'];
-        if ($age_weeks >= $vaccine['recommended_age_weeks']) {
-            $total_due_count++;
-            if (!in_array($vaccine['vaccine_name'], $given_vaccines) && $age_weeks > $due_at) {
-                $overdue_count++;
-            }
-        }
-    }
-
-    if ($overdue_count > 0) {
-        return ['label' => "Overdue ($overdue_count)", 'badge' => 'danger'];
-    } elseif ($total_due_count > 0 && count($given_vaccines) >= $total_due_count) {
-        return ['label' => 'Complete for age', 'badge' => 'success'];
-   } elseif ($total_due_count > 0) {
-        return ['label' => 'In progress', 'badge' => 'secondary'];
-    }
-    return ['label' => 'Too young for schedule', 'badge' => 'secondary'];
-}
 
 // List all infants with resident + mother info
 $infants = $pdo->query("

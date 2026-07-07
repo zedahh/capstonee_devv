@@ -6,6 +6,24 @@ if (!isset($_SESSION['user_id'])) {
 }
 require '../../config/database.php';
 
+require '../../includes/functions.php';
+
+// Count infants currently overdue on their DOH EPI vaccination schedule
+$epi_schedule = $pdo->query("SELECT * FROM epi_schedule")->fetchAll(PDO::FETCH_ASSOC);
+$infants_for_fic = $pdo->query("
+    SELECT infant_records.infant_record_id, r.birth_date
+    FROM infant_records
+    JOIN residents r ON infant_records.resident_id = r.resident_id
+")->fetchAll(PDO::FETCH_ASSOC);
+
+$overdue_infant_count = 0;
+foreach ($infants_for_fic as $inf) {
+    $fic = getFicStatus($pdo, $inf['infant_record_id'], $inf['birth_date'], $epi_schedule);
+    if ($fic['overdue_count'] > 0) {
+        $overdue_infant_count++;
+    }
+}
+
 $total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active = 1")->fetchColumn();
 $pregnant_count = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk')")->fetchColumn();
 $infant_count = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)")->fetchColumn();
@@ -99,7 +117,16 @@ function getTrendInfo($months) {
     <?php endif; ?>
   <?php endforeach; ?>
 
+
+  <?php if ($overdue_infant_count > 0): ?>
+  <div class="alert alert-warning">
+    <strong><?= $overdue_infant_count ?> infant<?= $overdue_infant_count > 1 ? 's' : '' ?> overdue</strong> for DOH EPI vaccinations.
+    <a href="../infant/infant.php">View infant monitoring</a>
+  </div>
+  <?php endif; ?>
+
   <?php foreach ($seasonal_advisories as $adv): ?>
+  
   <div class="alert alert-info">
     <strong>Seasonal risk advisory — <?= htmlspecialchars($adv['disease_name']) ?>:</strong>
     <?= htmlspecialchars($adv['advisory_note']) ?>
@@ -134,6 +161,10 @@ function getTrendInfo($months) {
 
   <div class="mb-3">
     <a href="../residents/residents.php" class="btn btn-primary btn-sm">Resident Profiling</a>
+    <a href="../maternal/maternal.php" class="btn btn-primary btn-sm">Maternal Health</a>
+    <a href="../infant/infant.php" class="btn btn-primary btn-sm">Infant Monitoring</a>
+    <a href="../vaccination/vaccination.php" class="btn btn-primary btn-sm">Vaccination Records</a>
+    <a href="../disease/disease.php" class="btn btn-primary btn-sm">Disease Recording</a>
     <a href="../heatmap/heatmap.php" class="btn btn-primary btn-sm">Heatmap</a>
     <a href="../reports/reports.php" class="btn btn-primary btn-sm">Reports</a>
     <a href="../announcements/announcements.php" class="btn btn-primary btn-sm">Announcements</a>

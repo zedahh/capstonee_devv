@@ -5,13 +5,13 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 require '../../config/database.php';
+require '../../includes/functions.php';
 
 $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
 $is_filtered = ($start_date !== '' && $end_date !== '');
 
 if ($is_filtered) {
-    // Historical range mode: count all cases reported in this range, regardless of current status
     $stmt = $pdo->prepare("
         SELECT r.purok, COUNT(*) as case_count
         FROM disease_cases dc
@@ -21,7 +21,6 @@ if ($is_filtered) {
     ");
     $stmt->execute([$start_date, $end_date]);
 } else {
-    // Default mode: current active/under-monitoring snapshot
     $stmt = $pdo->query("
         SELECT r.purok, COUNT(*) as case_count
         FROM disease_cases dc
@@ -45,6 +44,55 @@ function getRiskLevel($count) {
 
 $ranking = $purok_counts;
 arsort($ranking);
+
+// Fetch individual active cases with resident info, for the clickable dots
+if ($is_filtered) {
+    $caseStmt = $pdo->prepare("
+        SELECT dc.disease_name, dc.date_reported, dc.status, r.resident_id, r.first_name, r.last_name, r.purok, r.approx_lat, r.approx_lng
+        FROM disease_cases dc
+        JOIN residents r ON dc.resident_id = r.resident_id
+        WHERE dc.date_reported BETWEEN ? AND ?
+    ");
+    $caseStmt->execute([$start_date, $end_date]);
+} else {
+    $caseStmt = $pdo->query("
+        SELECT dc.disease_name, dc.date_reported, dc.status, r.resident_id, r.first_name, r.last_name, r.purok, r.approx_lat, r.approx_lng
+        FROM disease_cases dc
+        JOIN residents r ON dc.resident_id = r.resident_id
+        WHERE dc.status IN ('Active', 'Under monitoring')
+    ");
+}
+$cases = $caseStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Generate and save an approximate location for any resident who doesn't have one yet,
+// then group all case records by resident so each person gets exactly one marker
+$residents_map = [];
+foreach ($cases as $c) {
+    if ($c['approx_lat'] === null || $c['approx_lng'] === null) {
+        [$lat, $lng] = generateApproxLocation($c['purok']);
+        $upd = $pdo->prepare("UPDATE residents SET approx_lat = ?, approx_lng = ? WHERE resident_id = ?");
+        $upd->execute([$lat, $lng, $c['resident_id']]);
+        $c['approx_lat'] = $lat;
+        $c['approx_lng'] = $lng;
+    }
+
+    $rid = $c['resident_id'];
+    if (!isset($residents_map[$rid])) {
+        $residents_map[$rid] = [
+            'lat' => (float) $c['approx_lat'],
+            'lng' => (float) $c['approx_lng'],
+            'name' => $c['first_name'] . ' ' . $c['last_name'],
+            'purok' => $c['purok'],
+            'cases' => [],
+        ];
+    }
+    $residents_map[$rid]['cases'][] = [
+        'disease' => $c['disease_name'],
+        'date' => $c['date_reported'],
+        'status' => $c['status'],
+    ];
+}
+$case_points = array_values($residents_map);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,33 +113,21 @@ arsort($ranking);
   </div>
 
   <form method="GET" action="" class="row g-2 align-items-center mb-2">
-    <div class="col-auto">
-      <label class="col-form-label col-form-label-sm">From</label>
-    </div>
-    <div class="col-auto">
-      <input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($start_date) ?>">
-    </div>
-    <div class="col-auto">
-      <label class="col-form-label col-form-label-sm">To</label>
-    </div>
-    <div class="col-auto">
-      <input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($end_date) ?>">
-    </div>
-    <div class="col-auto">
-      <button type="submit" class="btn btn-sm btn-primary">Apply date range</button>
-    </div>
+    <div class="col-auto"><label class="col-form-label col-form-label-sm">From</label></div>
+    <div class="col-auto"><input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($start_date) ?>"></div>
+    <div class="col-auto"><label class="col-form-label col-form-label-sm">To</label></div>
+    <div class="col-auto"><input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($end_date) ?>"></div>
+    <div class="col-auto"><button type="submit" class="btn btn-sm btn-primary">Apply date range</button></div>
     <?php if ($is_filtered): ?>
-    <div class="col-auto">
-      <a href="heatmap.php" class="btn btn-sm btn-outline-secondary">Clear (show current)</a>
-    </div>
+    <div class="col-auto"><a href="heatmap.php" class="btn btn-sm btn-outline-secondary">Clear (show current)</a></div>
     <?php endif; ?>
   </form>
 
   <p class="text-muted small mb-3">
     <?php if ($is_filtered): ?>
-      Showing all cases reported between <strong><?= htmlspecialchars($start_date) ?></strong> and <strong><?= htmlspecialchars($end_date) ?></strong>, regardless of current status.
+      Showing all cases reported between <strong><?= htmlspecialchars($start_date) ?></strong> and <strong><?= htmlspecialchars($end_date) ?></strong>.
     <?php else: ?>
-      Showing current <strong>active / under-monitoring</strong> cases (no date filter applied).
+      Showing current <strong>active / under-monitoring</strong> cases. Click a dot to see case details.
     <?php endif; ?>
   </p>
 
@@ -113,7 +149,7 @@ arsort($ranking);
           <?php endforeach; ?>
         </tbody>
       </table>
-      <p class="text-muted small">Risk levels: Low (0-4), Moderate (5-9), High (10+) — placeholder thresholds, adjust once confirmed with health center staff. Purok subdivisions are approximated as quadrants clipped to the real barangay outline until an official purok map is available.</p>
+      <p class="text-muted small">Individual dots show an approximate location within each resident's actual purok — not their real address, since only purok-level data is captured. Risk levels: Low (0-4), Moderate (5-9), High (10+).</p>
     </div>
   </div>
 </div>
@@ -122,6 +158,7 @@ arsort($ranking);
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script>
 const purokData = <?= json_encode($purok_counts) ?>;
+const casePoints = <?= json_encode($case_points) ?>;
 
 function getColor(count) {
     if (count >= 10) return '#E24B4A';
@@ -199,9 +236,24 @@ for (const purok in quadrantRects) {
     const color = getColor(count);
 
     L.geoJSON(clipped, {
-        style: { color: '#555', weight: 1, fillColor: color, fillOpacity: 0.5 }
+        style: { color: '#555', weight: 1, fillColor: color, fillOpacity: 0.35 }
     }).bindPopup(`<strong>Purok ${purok}</strong><br>Cases: ${count}`).addTo(map);
 }
+
+// One clickable dot per resident, listing all their case records
+casePoints.forEach(function(c) {
+    let caseListHtml = c.cases.map(function(cs) {
+        return `${cs.disease} &mdash; ${cs.date} &mdash; ${cs.status}`;
+    }).join('<br>');
+
+    L.circleMarker([c.lat, c.lng], {
+        radius: 3,
+        color: '#222',
+        weight: 1,
+        fillColor: '#333',
+        fillOpacity: 0.85
+    }).bindPopup(`<strong>${c.name}</strong><br>Purok ${c.purok}<br>${caseListHtml}`).addTo(map);
+});
 </script>
 </body>
 </html>

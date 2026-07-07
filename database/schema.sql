@@ -242,3 +242,8 @@ CREATE TABLE IF NOT EXISTS sms_log (
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sent_by) REFERENCES users(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Approximate map location per resident, generated once and reused
+ALTER TABLE residents ADD COLUMN approx_lat DECIMAL(10,7) NULL;
+ALTER TABLE residents ADD COLUMN approx_lng DECIMAL(10,7) NULL;

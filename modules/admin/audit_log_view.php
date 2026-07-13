@@ -3,17 +3,202 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Audit Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="../../assets/css/custom.css" rel="stylesheet">
+<style>
+  :root {
+    --bhms-green: #2E7D52;
+    --bhms-green-dark: #1F5C3B;
+    --bhms-green-darker: #164430;
+    --bhms-green-light: #E6F4EC;
+    --bhms-blue: #185FA5;
+    --bhms-blue-dark: #0F477F;
+    --bhms-gray-50: #F7F9FA;
+    --bhms-gray-100: #EEF1F3;
+    --bhms-gray-200: #E3E7EA;
+    --bhms-gray-300: #D3D9DE;
+    --bhms-gray-400: #9CA6AD;
+    --bhms-gray-600: #5C6670;
+    --bhms-gray-800: #2C333A;
+    --bhms-radius-lg: 16px;
+    --bhms-radius: 12px;
+    --bhms-radius-sm: 8px;
+    --bhms-shadow-sm: 0 1px 3px rgba(30,41,59,0.06), 0 1px 2px rgba(30,41,59,0.08);
+    --bhms-shadow-md: 0 8px 24px rgba(30,41,59,0.10);
+    --bhms-sidebar-width: 264px;
+    --bhms-topbar-height: 68px;
+  }
+
+  body.bhms-app-body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--bhms-gray-800);
+    background: linear-gradient(160deg, #f4faf7 0%, #f7f9fa 45%, #eaf2fb 100%);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3,h4,h5,h6 { font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--bhms-gray-800); }
+  a { color: var(--bhms-blue); text-decoration: none; }
+  a:hover { color: var(--bhms-blue-dark); }
+
+  /* ---- App shell: sidebar + topbar ---- */
+  .bhms-shell { display: flex; min-height: 100vh; }
+  .bhms-sidebar-checkbox { display: none; }
+  .bhms-sidebar {
+    width: var(--bhms-sidebar-width);
+    position: fixed; top: 0; left: 0; bottom: 0;
+    display: flex; flex-direction: column;
+    background: linear-gradient(180deg, var(--bhms-green-darker) 0%, var(--bhms-green-dark) 55%, var(--bhms-green) 100%);
+    color: #fff; z-index: 1030;
+    transition: transform 0.25s ease;
+  }
+  .bhms-sidebar-brand { display: flex; align-items: center; gap: 0.8rem; padding: 1.5rem 1.35rem; border-bottom: 1px solid rgba(255,255,255,0.14); }
+  .bhms-sidebar-brand i {
+    font-size: 1.6rem; color: #fff; background: rgba(255,255,255,0.14);
+    height: 42px; width: 42px; display: flex; align-items: center; justify-content: center;
+    border-radius: var(--bhms-radius-sm); flex-shrink: 0;
+  }
+  .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
+  .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
+  .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
+  .bhms-nav-link {
+    display: flex; align-items: center; gap: 0.75rem; padding: 0.62rem 0.9rem; margin-bottom: 0.2rem;
+    border-radius: 10px; color: rgba(255,255,255,0.85); font-size: 0.885rem; font-weight: 500;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .bhms-nav-link i { width: 18px; text-align: center; font-size: 0.95rem; }
+  .bhms-nav-link:hover { background: rgba(255,255,255,0.12); color: #fff; }
+  .bhms-nav-link.active { background: #fff; color: var(--bhms-green-dark); font-weight: 600; box-shadow: var(--bhms-shadow-sm); }
+  .bhms-nav-divider { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; padding: 0.85rem 0.9rem 0.3rem; }
+  .bhms-sidebar-footer { padding: 0.85rem 0.75rem; border-top: 1px solid rgba(255,255,255,0.14); }
+  .bhms-logout-link:hover { background: rgba(214,69,69,0.4); }
+  .bhms-overlay { display: none; position: fixed; inset: 0; background: rgba(20,24,28,0.45); z-index: 1020; }
+  .bhms-main { flex: 1 1 auto; margin-left: var(--bhms-sidebar-width); display: flex; flex-direction: column; min-height: 100vh; min-width: 0; }
+  .bhms-topbar {
+    height: var(--bhms-topbar-height); background: #fff; border-bottom: 1px solid var(--bhms-gray-200);
+    display: flex; align-items: center; gap: 1rem; padding: 0 1.5rem; position: sticky; top: 0; z-index: 900;
+  }
+  .bhms-menu-btn { display: none; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: var(--bhms-radius-sm); color: var(--bhms-green-dark); font-size: 1.05rem; cursor: pointer; flex-shrink: 0; }
+  .bhms-menu-btn:hover { background: var(--bhms-gray-100); }
+  .bhms-topbar-title { font-weight: 600; font-size: 1.02rem; color: var(--bhms-gray-800); flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bhms-topbar-user { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--bhms-gray-600); white-space: nowrap; }
+  .bhms-topbar-user i { font-size: 1.3rem; color: var(--bhms-gray-400); }
+  .bhms-topbar-user .bhms-role-pill { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; background: var(--bhms-green-light); color: var(--bhms-green-dark); padding: 0.15rem 0.55rem; border-radius: 999px; font-weight: 600; }
+  .bhms-content { flex: 1 1 auto; padding-bottom: 2rem; }
+
+  @media (max-width: 992px) {
+    .bhms-sidebar { transform: translateX(-100%); }
+    .bhms-sidebar-checkbox:checked ~ .bhms-sidebar { transform: translateX(0); }
+    .bhms-sidebar-checkbox:checked ~ .bhms-overlay { display: block; }
+    .bhms-main { margin-left: 0; }
+    .bhms-menu-btn { display: flex; }
+    .bhms-topbar-title { font-size: 0.95rem; }
+  }
+  @media (max-width: 576px) {
+    .bhms-topbar-user span:not(.bhms-role-pill) { display: none; }
+  }
+
+  
+  .btn { border-radius: 10px; font-weight: 500; padding: 0.5rem 1.1rem; font-size: 0.88rem; transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease, border-color 0.15s ease; }
+  .btn-sm { padding: 0.32rem 0.75rem; font-size: 0.8rem; border-radius: 8px; }
+  .btn-outline-secondary { color: var(--bhms-gray-600); border-color: var(--bhms-gray-300); }
+  .btn-outline-secondary:hover { background: var(--bhms-gray-600); border-color: var(--bhms-gray-600); }
+
+  
+  .bhms-content .container > .d-flex.justify-content-between.align-items-center.mb-4 {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: var(--bhms-radius-lg);
+    padding: 1.1rem 1.4rem;
+    box-shadow: var(--bhms-shadow-sm);
+  }
+  .bhms-content h3 { margin-bottom: 0; font-size: 1.25rem; display: flex; align-items: center; }
+
+  
+  .audit-table-card {
+    background: #fff;
+    border-radius: var(--bhms-radius-lg);
+    box-shadow: var(--bhms-shadow-sm);
+    overflow: hidden;
+  }
+  .table { margin-bottom: 0; border-collapse: separate; border-spacing: 0; }
+  .table thead th {
+    background: linear-gradient(135deg, var(--bhms-green-light), #eaf2fb);
+    color: var(--bhms-green-dark);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    border-bottom: none;
+    padding: 0.85rem 1rem;
+    white-space: nowrap;
+  }
+  .table td {
+    padding: 0.7rem 1rem;
+    vertical-align: middle;
+    font-size: 0.85rem;
+    border-color: var(--bhms-gray-100);
+  }
+  .table-striped > tbody > tr:nth-of-type(odd) > * { background-color: var(--bhms-gray-50); }
+  .table > tbody > tr:hover > * { background-color: var(--bhms-green-light); }
+</style>
 </head>
-<body>
+<body class="bhms-app-body">
+<div class="bhms-shell">
+  <input type="checkbox" id="bhmsSidebarToggle" class="bhms-sidebar-checkbox">
+  <aside class="bhms-sidebar">
+    <div class="bhms-sidebar-brand">
+      <i class="fa-solid fa-notes-medical"></i>
+      <div>
+        <span class="bhms-brand-title">Barangay Santa Ines</span>
+        <span class="bhms-brand-sub">Health Monitoring System</span>
+      </div>
+    </div>
+    <nav class="bhms-nav">
+      <a href="../dashboard/dashboard.php" class="bhms-nav-link"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <a href="../residents/residents.php" class="bhms-nav-link"><i class="fa-solid fa-users"></i><span>Resident Profiling</span></a>
+      <a href="../maternal/maternal.php" class="bhms-nav-link"><i class="fa-solid fa-person-pregnant"></i><span>Maternal Health</span></a>
+      <a href="../infant/infant.php" class="bhms-nav-link"><i class="fa-solid fa-baby"></i><span>Infant Monitoring</span></a>
+      <a href="../vaccination/vaccination.php" class="bhms-nav-link"><i class="fa-solid fa-syringe"></i><span>Vaccination Records</span></a>
+      <a href="../disease/disease.php" class="bhms-nav-link"><i class="fa-solid fa-virus"></i><span>Disease Recording</span></a>
+      <a href="../heatmap/heatmap.php" class="bhms-nav-link"><i class="fa-solid fa-map-location-dot"></i><span>Heatmap</span></a>
+      <a href="../reports/reports.php" class="bhms-nav-link"><i class="fa-solid fa-file-lines"></i><span>Reports</span></a>
+      <a href="../announcements/announcements.php" class="bhms-nav-link"><i class="fa-solid fa-bullhorn"></i><span>Announcements</span></a>
+      <?php if ($_SESSION['role'] === 'administrator'): ?>
+      <div class="bhms-nav-divider">Admin</div>
+      <a href="../admin/audit_log.php" class="bhms-nav-link active"><i class="fa-solid fa-clipboard-list"></i><span>Audit Log</span></a>
+      <a href="../admin/lgu_contacts.php" class="bhms-nav-link"><i class="fa-solid fa-address-book"></i><span>LGU Contacts</span></a>
+      <?php endif; ?>
+    </nav>
+    <div class="bhms-sidebar-footer">
+      <a href="../auth/logout.php" class="bhms-nav-link bhms-logout-link"><i class="fa-solid fa-right-from-bracket"></i><span>Log out</span></a>
+    </div>
+  </aside>
+  <label for="bhmsSidebarToggle" class="bhms-overlay"></label>
+  <div class="bhms-main">
+    <header class="bhms-topbar">
+      <label for="bhmsSidebarToggle" class="bhms-menu-btn" aria-label="Toggle navigation"><i class="fa-solid fa-bars"></i></label>
+      <div class="bhms-topbar-title">Audit Log</div>
+      <div class="bhms-topbar-user">
+        <i class="fa-regular fa-circle-user"></i>
+        <span><?= htmlspecialchars($_SESSION['full_name']) ?></span>
+        <span class="bhms-role-pill"><?= $_SESSION['role'] === 'administrator' ? 'Administrator' : 'BHW' ?></span>
+      </div>
+    </header>
+    <main class="bhms-content">
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3>Audit log</h3>
+    <h3><i class="fa-solid fa-clipboard-list me-2" style="color:var(--bhms-green);"></i>Audit log</h3>
     <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
   </div>
 
+  <div class="audit-table-card">
   <table class="table table-striped table-sm">
     <thead>
       <tr>
@@ -33,6 +218,18 @@
       <?php endforeach; ?>
     </tbody>
   </table>
+  </div>
 </div>
+    </main>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.bhms-nav-link').forEach(function (link) {
+  link.addEventListener('click', function () {
+    var cb = document.getElementById('bhmsSidebarToggle');
+    if (cb) { cb.checked = false; }
+  });
+});
+</script>
 </body>
 </html>

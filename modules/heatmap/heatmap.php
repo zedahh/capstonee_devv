@@ -36,10 +36,26 @@ foreach ($counts_raw as $row) {
     $purok_counts[(int)$row['purok']] = (int)$row['case_count'];
 }
 
-function getRiskLevel($count) {
-    if ($count >= 10) return ['level' => 'High', 'color' => '#E24B4A'];
-    if ($count >= 5) return ['level' => 'Moderate', 'color' => '#EF9F27'];
-    return ['level' => 'Low', 'color' => '#639922'];
+// Resident population per purok, so risk level reflects rate, not raw count
+$purok_population_raw = $pdo->query("
+    SELECT purok, COUNT(*) as total
+    FROM residents
+    WHERE is_active = 1
+    GROUP BY purok
+")->fetchAll(PDO::FETCH_ASSOC);
+$purok_population = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
+foreach ($purok_population_raw as $row) {
+    $purok_population[(int) $row['purok']] = (int) $row['total'];
+}
+
+function getRiskLevel($count, $population) {
+    if ($population <= 0) {
+        return ['level' => 'Low', 'color' => '#639922', 'rate' => 0];
+    }
+    $rate = ($count / $population) * 100;
+    if ($rate >= 7) return ['level' => 'High', 'color' => '#E24B4A', 'rate' => $rate];
+    if ($rate >= 3) return ['level' => 'Moderate', 'color' => '#EF9F27', 'rate' => $rate];
+    return ['level' => 'Low', 'color' => '#639922', 'rate' => $rate];
 }
 
 $ranking = $purok_counts;
@@ -93,5 +109,6 @@ foreach ($cases as $c) {
     ];
 }
 $case_points = array_values($residents_map);
+$purok_population_json = json_encode($purok_population);
 
 require 'heatmap_view.php'; }

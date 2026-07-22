@@ -147,6 +147,9 @@ if (!isset($total_residents)) { return; }
   .alert-success { background: var(--bhms-success-light); color: var(--bhms-green-darker); border-left-color: var(--bhms-green); }
   .alert-info { background: var(--bhms-info-light); color: var(--bhms-blue-dark); border-left-color: var(--bhms-blue); }
   .badge { font-weight: 600; padding: 0.4em 0.75em; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.02em; }
+  .badge.bg-danger { background-color: var(--bhms-danger) !important; }
+.badge.bg-warning { background-color: var(--bhms-warning) !important; color: #fff !important; }
+.badge.bg-info { background-color: var(--bhms-blue) !important; }
   .table thead th { background: var(--bhms-green-light); color: var(--bhms-green-dark); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; border-bottom: none; padding: 0.75rem 0.9rem; }
   .table td { padding: 0.7rem 0.9rem; vertical-align: middle; font-size: 0.88rem; }
 
@@ -311,26 +314,60 @@ if (!isset($total_residents)) { return; }
     </div>
   </div>
 
-  <?php foreach ($threshold_alerts as $alert): $level = getRiskLevel($alert['case_count']); ?>
-    <?php if ($level === 'high' || $level === 'moderate'): ?>
-    <?php
-      $draft_title = "Health Advisory: " . $alert['disease_name'] . " Alert in Purok " . $alert['purok'];
-      $draft_content = "The health center has recorded " . $alert['case_count'] . " active " . $alert['disease_name'] . " case(s) in Purok " . $alert['purok'] . ", exceeding the alert threshold. Residents are advised to take necessary precautions. Please contact the health center for more information.";
-    ?>
-    <div class="alert <?= $level === 'high' ? 'alert-danger' : 'alert-warning' ?>">
-      <i class="fa-solid fa-triangle-exclamation me-2"></i><strong>Active alert: Purok <?= htmlspecialchars($alert['purok']) ?></strong> —
-      <?= htmlspecialchars($alert['disease_name']) ?> cases have reached <?= $level ?> risk level
-      (<?= $alert['case_count'] ?> active cases) — exceeds the configured threshold.
-      <a href="../heatmap/heatmap.php">View heatmap</a>
-      ·
-      <a href="../announcements/announcements.php?draft_title=<?= urlencode($draft_title) ?>&draft_content=<?= urlencode($draft_content) ?>&draft_purok=<?= urlencode($alert['purok']) ?>">Draft public advisory</a>
-      ·
-      <a href="../reports/lgu_briefing.php?purok=<?= urlencode($alert['purok']) ?>&disease=<?= urlencode($alert['disease_name']) ?>&count=<?= urlencode($alert['case_count']) ?>" target="_blank">Generate LGU briefing (PDF)</a>
-      ·
-      <a href="../admin/notify_lgu.php?purok=<?= urlencode($alert['purok']) ?>&disease=<?= urlencode($alert['disease_name']) ?>&count=<?= urlencode($alert['case_count']) ?>" onclick="return confirm('Send SMS notification to all LGU contacts?')">Notify LGU via SMS</a>
+  <?php
+    $active_alerts = [];
+    foreach ($threshold_alerts as $alert) {
+        $level = getRiskLevel($alert['case_count'], $purok_population[$alert['purok']] ?? 0);
+        if ($level === 'high' || $level === 'moderate') {
+            $alert['level'] = $level;
+            $active_alerts[] = $alert;
+        }
+    }
+    usort($active_alerts, fn($a, $b) => ($b['level'] === 'high' ? 1 : 0) <=> ($a['level'] === 'high' ? 1 : 0) ?: $b['case_count'] <=> $a['case_count']);
+    $high_count = count(array_filter($active_alerts, fn($a) => $a['level'] === 'high'));
+    $moderate_count = count($active_alerts) - $high_count;
+  ?>
+  <?php if (!empty($active_alerts)): ?>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">
+        <i class="fa-solid fa-triangle-exclamation me-2" style="color:var(--bhms-danger);"></i>Active Health Alerts
+        <span class="badge bg-danger ms-2"><?= $high_count ?> high</span>
+        <span class="badge bg-warning text-dark ms-1"><?= $moderate_count ?> moderate</span>
+      </h5>
+      <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead><tr><th>Purok</th><th>Disease</th><th>Cases</th><th>Risk</th><th>Actions</th></tr></thead>
+        <tbody>
+          <?php foreach ($active_alerts as $i => $alert): ?>
+          <?php
+            $draft_title = "Health Advisory: " . $alert['disease_name'] . " Alert in Purok " . $alert['purok'];
+            $draft_content = "The health center has recorded " . $alert['case_count'] . " active " . $alert['disease_name'] . " case(s) in Purok " . $alert['purok'] . ", exceeding the alert threshold. Residents are advised to take necessary precautions. Please contact the health center for more information.";
+          ?>
+          <tr>
+            <td>Purok <?= htmlspecialchars($alert['purok']) ?></td>
+            <td><?= htmlspecialchars($alert['disease_name']) ?></td>
+            <td><?= $alert['case_count'] ?></td>
+            <td><span class="badge <?= $alert['level'] === 'high' ? 'bg-danger' : 'bg-warning text-dark' ?>"><?= ucfirst($alert['level']) ?></span></td>
+            <td>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Actions</button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="../heatmap/heatmap.php">View heatmap</a></li>
+                  <li><a class="dropdown-item" href="../announcements/announcements.php?draft_title=<?= urlencode($draft_title) ?>&draft_content=<?= urlencode($draft_content) ?>&draft_purok=<?= urlencode($alert['purok']) ?>">Draft public advisory</a></li>
+                  <li><a class="dropdown-item" href="../reports/lgu_briefing.php?purok=<?= urlencode($alert['purok']) ?>&disease=<?= urlencode($alert['disease_name']) ?>&count=<?= urlencode($alert['case_count']) ?>" target="_blank">Generate LGU briefing (PDF)</a></li>
+                  <li><a class="dropdown-item" href="../admin/notify_lgu.php?purok=<?= urlencode($alert['purok']) ?>&disease=<?= urlencode($alert['disease_name']) ?>&count=<?= urlencode($alert['case_count']) ?>" onclick="return confirm('Send SMS notification to all LGU contacts?')">Notify LGU via SMS</a></li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+      </div>
     </div>
-    <?php endif; ?>
-  <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
 
   <?php if (isset($_GET['sms_sent'])): ?>
   <div class="alert alert-success"><i class="fa-solid fa-circle-check me-2"></i><?= (int) $_GET['sms_sent'] ?> SMS notification(s) sent to LGU contacts (simulated).</div>
@@ -350,12 +387,27 @@ if (!isset($total_residents)) { return; }
   </div>
   <?php endif; ?>
 
-  <?php foreach ($seasonal_advisories as $adv): ?>
-  <div class="alert alert-info">
-    <i class="fa-solid fa-cloud-sun-rain me-2"></i><strong>Seasonal risk advisory — <?= htmlspecialchars($adv['disease_name']) ?>:</strong>
-    <?= htmlspecialchars($adv['advisory_note']) ?>
+  <?php if (!empty($seasonal_advisories)): ?>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title"><i class="fa-solid fa-cloud-sun-rain me-2" style="color:var(--bhms-blue);"></i>Seasonal Risk Advisories <span class="badge bg-info text-dark ms-2"><?= count($seasonal_advisories) ?></span></h5>
+      <div class="accordion" id="seasonalAccordion">
+        <?php foreach ($seasonal_advisories as $i => $adv): ?>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button <?= $i > 0 ? 'collapsed' : '' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#seasonal<?= $i ?>">
+              <?= htmlspecialchars($adv['disease_name']) ?>
+            </button>
+          </h2>
+          <div id="seasonal<?= $i ?>" class="accordion-collapse collapse <?= $i === 0 ? 'show' : '' ?>" data-bs-parent="#seasonalAccordion">
+            <div class="accordion-body"><?= htmlspecialchars($adv['advisory_note']) ?></div>
+          </div>
+        </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
   </div>
-  <?php endforeach; ?>
+  <?php endif; ?>
 
   <div class="row g-3 mb-4">
     <div class="col-md-2"><div class="card p-3 text-center stat-card stat-card-residents"><div class="stat-card-icon"><i class="fa-solid fa-users"></i></div><h6>Total residents</h6><p class="fs-4 mb-0"><?= $total_residents ?></p></div></div>
@@ -417,7 +469,10 @@ if (!isset($total_residents)) { return; }
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+const purokPopulation = <?= json_encode($purok_population) ?>;
+
 new Chart(document.getElementById('purokChart'), {
     type: 'bar',
     data: {
@@ -434,7 +489,23 @@ new Chart(document.getElementById('purokChart'), {
         }]
     },
     options: {
-        plugins: { legend: { display: false } },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const purok = context.dataIndex + 1;
+                        const cases = context.parsed.y;
+                        const population = purokPopulation[purok] || 0;
+                        if (population === 0) {
+                            return cases + ' active case(s)';
+                        }
+                        const rate = ((cases / population) * 100).toFixed(1);
+                        return cases + ' active case(s) out of ' + population + ' residents (' + rate + '%)';
+                    }
+                }
+            }
+        },
         scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
     }
 });

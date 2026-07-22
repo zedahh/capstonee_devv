@@ -19,19 +19,22 @@ $cases_this_month = $pdo->query("
 ")->fetchColumn();
 
 // Threshold alert check: any disease + purok combination currently over threshold
+// HAVING case_count >= 1 just avoids empty rows; real risk classification is rate-based below
 $threshold_alerts = $pdo->query("
     SELECT r.purok, dc.disease_name, COUNT(*) as case_count
     FROM disease_cases dc
     JOIN residents r ON dc.resident_id = r.resident_id
    WHERE dc.status IN ('Active', 'Under monitoring') AND dc.is_active = 1
     GROUP BY r.purok, dc.disease_name
-    HAVING case_count >= 5
+    HAVING case_count >= 1
     ORDER BY case_count DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-function getRiskLevel($count) {
-    if ($count >= 10) return 'high';
-    if ($count >= 5) return 'moderate';
+function getRiskLevel($count, $population) {
+    if ($population <= 0) return 'low';
+    $rate = ($count / $population) * 100;
+    if ($rate >= 7) return 'high';
+    if ($rate >= 3) return 'moderate';
     return 'low';
 }
 
@@ -118,6 +121,17 @@ $purok_chart_raw = $pdo->query("
 $purok_chart_data = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
 foreach ($purok_chart_raw as $row) {
     $purok_chart_data[(int) $row['purok']] = (int) $row['total'];
+}
+// Resident population per purok, for population-aware tooltips
+$purok_population_raw = $pdo->query("
+    SELECT purok, COUNT(*) as total
+    FROM residents
+    WHERE is_active = 1
+    GROUP BY purok
+")->fetchAll(PDO::FETCH_ASSOC);
+$purok_population = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
+foreach ($purok_population_raw as $row) {
+    $purok_population[(int) $row['purok']] = (int) $row['total'];
 }
 
 // Chart 2: total cases reported per month, last 6 months (line chart)

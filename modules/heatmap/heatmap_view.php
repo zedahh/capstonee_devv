@@ -239,7 +239,7 @@ if (!isset($case_points)) { return; }
       <table class="table table-striped">
         <thead><tr><th>Purok</th><th>Cases</th><th>Risk level</th></tr></thead>
         <tbody>
-          <?php foreach ($ranking as $purok => $count): $risk = getRiskLevel($count); ?>
+          <?php foreach ($ranking as $purok => $count): $risk = getRiskLevel($count, $purok_population[$purok] ?? 0); ?>
           <tr>
             <td>Purok <?= $purok ?></td>
             <td><?= $count ?></td>
@@ -259,10 +259,13 @@ if (!isset($case_points)) { return; }
 <script>
 const purokData = <?= json_encode($purok_counts) ?>;
 const casePoints = <?= json_encode($case_points) ?>;
+const purokPopulation = <?= $purok_population_json ?>;
 
-function getColor(count) {
-    if (count >= 10) return '#E24B4A';
-    if (count >= 5) return '#EF9F27';
+function getColor(count, population) {
+    if (!population || population <= 0) return '#639922';
+    const rate = (count / population) * 100;
+    if (rate >= 7) return '#E24B4A';
+    if (rate >= 3) return '#EF9F27';
     return '#639922';
 }
 
@@ -308,15 +311,17 @@ const purokBoundaries = <?= $purok_boundaries_json ?>;
 
 for (const purok in purokBoundaries) {
     const count = purokData[purok] || 0;
-    const color = getColor(count);
+    const population = purokPopulation[purok] || 0;
+    const color = getColor(count, population);
     const latlngs = purokBoundaries[purok].map(function(pt) { return [pt[1], pt[0]]; });
+    const rateText = population > 0 ? ((count / population) * 100).toFixed(1) + '%' : 'N/A';
 
     L.polygon(latlngs, {
         color: '#164430',
         weight: 1.5,
         fillColor: color,
         fillOpacity: 0.55
-    }).bindPopup(`<strong>Purok ${purok}</strong><br>Cases: ${count}`).addTo(map);
+    }).bindPopup(`<strong>Purok ${purok}</strong><br>Cases: ${count} of ${population} residents (${rateText})`).addTo(map);
 }
 
 L.geoJSON(santaInesBoundary, {

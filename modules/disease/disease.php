@@ -10,6 +10,17 @@ $error = '';
 $success = '';
 $edit_case = null;
 
+if (isset($_GET['archive'])) {
+    $archive_id = (int) $_GET['archive'];
+    $pdo->prepare("UPDATE disease_cases SET is_active = 0 WHERE case_id = ?")->execute([$archive_id]);
+
+    $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, table_name, record_id, details) VALUES (?, 'ARCHIVE', 'disease_cases', ?, 'Archived disease case')");
+    $log->execute([$_SESSION['user_id'], $archive_id]);
+
+    header('Location: disease.php');
+    exit;
+}
+
 // Load a case into the form for editing (mainly for status updates)
 if (isset($_GET['edit'])) {
     $id = (int) $_GET['edit'];
@@ -59,6 +70,7 @@ $cases = $pdo->query("
     SELECT disease_cases.*, r.first_name, r.last_name, r.purok
     FROM disease_cases
     JOIN residents r ON disease_cases.resident_id = r.resident_id
+    WHERE disease_cases.is_active = 1
     ORDER BY disease_cases.date_reported DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 

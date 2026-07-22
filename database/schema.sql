@@ -247,3 +247,18 @@ CREATE TABLE IF NOT EXISTS sms_log (
 -- Approximate map location per resident, generated once and reused
 ALTER TABLE residents ADD COLUMN approx_lat DECIMAL(10,7) NULL;
 ALTER TABLE residents ADD COLUMN approx_lng DECIMAL(10,7) NULL;
+
+
+-- Added: is_active columns for archive/soft-delete support
+ALTER TABLE maternal_records ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1;
+ALTER TABLE infant_records ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1;
+ALTER TABLE vaccination_records ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1;
+ALTER TABLE disease_cases ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1;
+
+-- Added: expanded seasonal advisories (DOH WILD and 6S frameworks)
+INSERT INTO seasonal_risk_reference (disease_name, start_month, end_month, advisory_note) VALUES
+('Leptospirosis', 6, 11, 'Rainy season and flooding increase leptospirosis risk from floodwater contaminated with animal urine. Residents are advised to avoid wading in floodwater and to wear protective footwear when exposure is unavoidable.'),
+('Influenza-like Illness', 6, 11, 'Rainy season historically shows increased influenza-like illness, often linked to crowded, poorly ventilated indoor spaces. Residents are advised to maintain good ventilation and practice respiratory hygiene.'),
+('Diarrhea', 6, 11, 'Rainy season flooding can contaminate water sources, increasing risk of diarrhea and other waterborne illness. Residents are advised to boil drinking water and maintain proper sanitation, in addition to dry-season food safety precautions.'),
+('Heat Stroke', 3, 5, 'Summer heat increases risk of heat exhaustion and heat stroke, especially among children and the elderly. Residents are advised to drink 7-8 glasses of water daily, avoid strenuous outdoor activity between 9 AM and 4 PM, and wear light, loose clothing.'),
+('Sore Eyes (Conjunctivitis)', 3, 5, 'Summer season shows increased cases of sore eyes (conjunctivitis), part of DOH''s recognized "6S" summer health risks. Residents are advised to avoid touching their eyes with unwashed hands and to practice good hygiene.');

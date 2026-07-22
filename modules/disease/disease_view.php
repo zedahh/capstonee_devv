@@ -280,6 +280,7 @@ if (!isset($cases)) { return; }
   </div>
 
   <h5><i class="fa-solid fa-list-check me-2"></i>All disease cases</h5>
+  <input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Search by resident or disease...">
   <div class="cases-table-card">
   <table class="table table-striped">
     <thead>
@@ -293,13 +294,25 @@ if (!isset($cases)) { return; }
         <td><?= htmlspecialchars($c['disease_name']) ?></td>
         <td><?= htmlspecialchars($c['date_reported']) ?></td>
         <td><?php $status_class = $c['status'] === 'Active' ? 'status-badge-active' : ($c['status'] === 'Under monitoring' ? 'status-badge-monitoring' : 'status-badge-recovered'); ?><span class="badge <?= $status_class ?>"><?= htmlspecialchars($c['status']) ?></span></td>
-        <td><a href="?edit=<?= $c['case_id'] ?>" class="btn btn-sm btn-outline-primary">Edit / update status</a></td>
+        <td>
+          <a href="?edit=<?= $c['case_id'] ?>" class="btn btn-sm btn-outline-primary">Edit / update status</a>
+          <a href="?archive=<?= $c['case_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Archive this case? It will stop counting toward alerts, the heatmap, and reports.')">Archive</a>
+        </td>
       </tr>
       <?php endforeach; ?>
     </tbody>
   </table>
   </div>
 </div>
+<script>
+document.getElementById('liveSearch').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.cases-table-card tbody tr');
+    rows.forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+    });
+});
+</script>
     </main>
   </div>
 </div>

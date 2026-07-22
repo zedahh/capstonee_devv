@@ -209,7 +209,10 @@ if (!isset($announcements)) { return; }
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h3><i class="fa-solid fa-bullhorn me-2" style="color:var(--bhms-green);"></i>Public Announcements</h3>
-    <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
+    <div>
+      <a href="public.php" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-eye me-1"></i>Preview public page</a>
+      <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
+    </div>
   </div>
 
   <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>

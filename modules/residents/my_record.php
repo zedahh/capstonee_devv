@@ -26,7 +26,7 @@ $vaccinations = [];
 
 if ($resident) {
    if ($start_date && $end_date) {
-        $stmt = $pdo->prepare("SELECT disease_name, date_reported, status FROM disease_cases WHERE resident_id = ? AND date_reported BETWEEN ? AND ? ORDER BY date_reported DESC");
+       $stmt = $pdo->prepare("SELECT disease_name, date_reported, status FROM disease_cases WHERE resident_id = ? AND date_reported BETWEEN ? AND ? AND is_active = 1 ORDER BY date_reported DESC");
         $stmt->execute([$resident['resident_id'], $start_date, $end_date]);
     } else {
         $stmt = $pdo->prepare("SELECT disease_name, date_reported, status FROM disease_cases WHERE resident_id = ? ORDER BY date_reported DESC");
@@ -34,7 +34,7 @@ if ($resident) {
     }
     $disease_cases = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->prepare("SELECT * FROM maternal_records WHERE resident_id = ? ORDER BY created_at DESC LIMIT 1");
+    $stmt = $pdo->prepare("SELECT * FROM maternal_records WHERE resident_id = ? AND is_active = 1 ORDER BY created_at DESC LIMIT 1");
     $stmt->execute([$resident['resident_id']]);
     $maternal_record = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($maternal_record) {
@@ -42,7 +42,7 @@ if ($resident) {
         $maternal_compliance = getPrenatalComplianceStatus($pdo, $maternal_record['maternal_record_id'], $maternal_record['lmp_date'], $maternal_record['monitoring_status'], $prenatal_schedule);
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM infant_records WHERE resident_id = ? ORDER BY created_at DESC LIMIT 1");
+    $stmt = $pdo->prepare("SELECT * FROM infant_records WHERE resident_id = ? AND is_active = 1 ORDER BY created_at DESC LIMIT 1");
     $stmt->execute([$resident['resident_id']]);
     $infant_record = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($infant_record) {
@@ -50,10 +50,10 @@ if ($resident) {
         $fic_status = getFicStatus($pdo, $infant_record['infant_record_id'], $resident['birth_date'], $epi_schedule);
 
        if ($start_date && $end_date) {
-            $stmt = $pdo->prepare("SELECT vaccine_name, date_administered FROM vaccination_records WHERE infant_record_id = ? AND date_administered BETWEEN ? AND ? ORDER BY date_administered");
+           $stmt = $pdo->prepare("SELECT vaccine_name, date_administered FROM vaccination_records WHERE infant_record_id = ? AND date_administered BETWEEN ? AND ? AND is_active = 1 ORDER BY date_administered");
             $stmt->execute([$infant_record['infant_record_id'], $start_date, $end_date]);
         } else {
-            $stmt = $pdo->prepare("SELECT vaccine_name, date_administered FROM vaccination_records WHERE infant_record_id = ? ORDER BY date_administered");
+           $stmt = $pdo->prepare("SELECT vaccine_name, date_administered FROM vaccination_records WHERE infant_record_id = ? AND is_active = 1 ORDER BY date_administered");
             $stmt->execute([$infant_record['infant_record_id']]);
         }
         $vaccinations = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -8,14 +8,14 @@ require '../../config/database.php';
 require '../../includes/functions.php';
 
 $total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active = 1")->fetchColumn();
-$pregnant_count = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk')")->fetchColumn();
-$infant_count = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)")->fetchColumn();
-$disease_count = $pdo->query("SELECT COUNT(*) FROM disease_cases WHERE status IN ('Active', 'Under monitoring')")->fetchColumn();
+$pregnant_count = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk') AND is_active = 1")->fetchColumn();
+$infant_count = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) AND ir.is_active = 1")->fetchColumn();
+$disease_count = $pdo->query("SELECT COUNT(*) FROM disease_cases WHERE status IN ('Active', 'Under monitoring') AND is_active = 1")->fetchColumn();
 
 // Total cases reported this calendar month, regardless of current status
 $cases_this_month = $pdo->query("
     SELECT COUNT(*) FROM disease_cases
-    WHERE YEAR(date_reported) = YEAR(CURDATE()) AND MONTH(date_reported) = MONTH(CURDATE())
+    WHERE YEAR(date_reported) = YEAR(CURDATE()) AND MONTH(date_reported) = MONTH(CURDATE()) AND is_active = 1
 ")->fetchColumn();
 
 // Threshold alert check: any disease + purok combination currently over threshold
@@ -23,7 +23,7 @@ $threshold_alerts = $pdo->query("
     SELECT r.purok, dc.disease_name, COUNT(*) as case_count
     FROM disease_cases dc
     JOIN residents r ON dc.resident_id = r.resident_id
-    WHERE dc.status IN ('Active', 'Under monitoring')
+   WHERE dc.status IN ('Active', 'Under monitoring') AND dc.is_active = 1
     GROUP BY r.purok, dc.disease_name
     HAVING case_count >= 5
     ORDER BY case_count DESC
@@ -50,7 +50,7 @@ $seasonal_advisories = $pdo->query("
 $monthly_data = $pdo->query("
     SELECT disease_name, DATE_FORMAT(date_reported, '%Y-%m') as ym, COUNT(*) as case_count
     FROM disease_cases
-    WHERE date_reported >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+    WHERE date_reported >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH) AND is_active = 1
     GROUP BY disease_name, ym
     ORDER BY disease_name, ym
 ")->fetchAll(PDO::FETCH_ASSOC);
@@ -78,7 +78,7 @@ function getTrendInfo($months) {
 
 // Count maternal records currently behind on prenatal visit compliance
 $prenatal_schedule = $pdo->query("SELECT * FROM prenatal_visit_schedule")->fetchAll(PDO::FETCH_ASSOC);
-$maternal_for_compliance = $pdo->query("SELECT maternal_record_id, lmp_date, monitoring_status FROM maternal_records")->fetchAll(PDO::FETCH_ASSOC);
+$maternal_for_compliance = $pdo->query("SELECT maternal_record_id, lmp_date, monitoring_status FROM maternal_records WHERE is_active = 1")->fetchAll(PDO::FETCH_ASSOC);
 
 $behind_maternal_count = 0;
 foreach ($maternal_for_compliance as $mat) {
@@ -94,6 +94,7 @@ $infants_for_fic = $pdo->query("
     SELECT infant_records.infant_record_id, r.birth_date
     FROM infant_records
     JOIN residents r ON infant_records.resident_id = r.resident_id
+    WHERE infant_records.is_active = 1
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 $overdue_infant_count = 0;
@@ -111,7 +112,7 @@ $purok_chart_raw = $pdo->query("
     SELECT r.purok, COUNT(*) as total
     FROM disease_cases dc
     JOIN residents r ON dc.resident_id = r.resident_id
-    WHERE dc.status IN ('Active', 'Under monitoring')
+    WHERE dc.status IN ('Active', 'Under monitoring') AND dc.is_active = 1
     GROUP BY r.purok
 ")->fetchAll(PDO::FETCH_ASSOC);
 $purok_chart_data = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
@@ -123,7 +124,7 @@ foreach ($purok_chart_raw as $row) {
 $monthly_totals_raw = $pdo->query("
     SELECT DATE_FORMAT(date_reported, '%Y-%m') as ym, COUNT(*) as total
     FROM disease_cases
-    WHERE date_reported >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+    WHERE date_reported >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) AND is_active = 1
     GROUP BY ym ORDER BY ym
 ")->fetchAll(PDO::FETCH_ASSOC);
 $monthly_labels = array_column($monthly_totals_raw, 'ym');

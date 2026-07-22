@@ -286,6 +286,7 @@ if (!isset($records)) { return; }
   </div>
 
   <h5><i class="fa-solid fa-list-check me-2"></i>All maternal records</h5>
+  <input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Search by name...">
   <div class="maternal-table-card">
   <table class="table table-striped">
     <thead>
@@ -302,7 +303,10 @@ if (!isset($records)) { return; }
         <td><?= htmlspecialchars($rec['edd_date']) ?></td>
         <td><?php $mstat_class = ['Ongoing' => 'status-badge-ongoing', 'High-risk' => 'status-badge-highrisk', 'Delivered' => 'status-badge-delivered', 'Postpartum' => 'status-badge-postpartum'][$rec['monitoring_status']] ?? 'status-badge-ongoing'; ?><span class="badge <?= $mstat_class ?>"><?= htmlspecialchars($rec['monitoring_status']) ?></span></td>
         <td><span class="badge bg-<?= $compliance['badge'] ?>"><?= htmlspecialchars($compliance['label']) ?></span></td>
-        <td><a href="checkups.php?id=<?= $rec['maternal_record_id'] ?>" class="btn btn-sm btn-outline-primary">View checkups</a></td>
+        <td>
+          <a href="checkups.php?id=<?= $rec['maternal_record_id'] ?>" class="btn btn-sm btn-outline-primary">View checkups</a>
+          <a href="?archive=<?= $rec['maternal_record_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Archive this maternal record? It will be hidden from the list but not permanently deleted.')">Archive</a>
+        </td>
       </tr>
       <?php endforeach; ?>
     </tbody>
@@ -317,6 +321,15 @@ document.getElementById('lmp_date').addEventListener('change', function() {
         lmp.setDate(lmp.getDate() + 280);
         document.getElementById('edd_date').value = lmp.toISOString().split('T')[0];
     }
+});
+</script>
+<script>
+document.getElementById('liveSearch').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.maternal-table-card tbody tr');
+    rows.forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+    });
 });
 </script>
     </main>

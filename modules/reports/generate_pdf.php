@@ -12,9 +12,9 @@ $total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active =
 $total_maternal = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk')")->fetchColumn();
 $total_infants = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)")->fetchColumn();
 $total_vaccinations = $pdo->query("SELECT COUNT(*) FROM vaccination_records")->fetchColumn();
-$total_disease_cases = $pdo->query("SELECT COUNT(*) FROM disease_cases WHERE status IN ('Active', 'Under monitoring')")->fetchColumn();
+$total_disease_cases = $pdo->query("SELECT COUNT(*) FROM disease_cases WHERE status IN ('Active', 'Under monitoring') AND is_active = 1")->fetchColumn();
 
-$disease_breakdown = $pdo->query("SELECT disease_name, COUNT(*) as total FROM disease_cases GROUP BY disease_name ORDER BY total DESC")->fetchAll(PDO::FETCH_ASSOC);
+$disease_breakdown = $pdo->query("SELECT disease_name, COUNT(*) as total FROM disease_cases WHERE is_active = 1 GROUP BY disease_name ORDER BY total DESC")->fetchAll(PDO::FETCH_ASSOC);
 $purok_breakdown = $pdo->query("SELECT r.purok, COUNT(*) as total FROM residents r WHERE r.is_active = 1 GROUP BY r.purok ORDER BY r.purok")->fetchAll(PDO::FETCH_ASSOC);
 
 $insights = [];

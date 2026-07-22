@@ -255,7 +255,7 @@ if (!isset($case_points)) { return; }
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
 <script>
 const purokData = <?= json_encode($purok_counts) ?>;
 const casePoints = <?= json_encode($case_points) ?>;
@@ -301,53 +301,34 @@ const santaInesBoundary = {
   }
 };
 
-const boundaryLayer = L.geoJSON(santaInesBoundary, {
-    style: { color: '#444', weight: 2, dashArray: '6 4', fill: false }
-}).addTo(map);
+const boundaryLayerTemp = L.geoJSON(santaInesBoundary);
+map.fitBounds(boundaryLayerTemp.getBounds());
 
-map.fitBounds(boundaryLayer.getBounds());
+const purokBoundaries = <?= $purok_boundaries_json ?>;
 
-const bounds = boundaryLayer.getBounds();
-const sw = bounds.getSouthWest();
-const ne = bounds.getNorthEast();
-const midLat = (sw.lat + ne.lat) / 2;
-const midLng = (sw.lng + ne.lng) / 2;
-
-function makeRectPolygon(latMin, latMax, lngMin, lngMax) {
-    return turf.polygon([[
-        [lngMin, latMin], [lngMin, latMax], [lngMax, latMax], [lngMax, latMin], [lngMin, latMin]
-    ]]);
-}
-
-const quadrantRects = {
-    1: makeRectPolygon(midLat, ne.lat, sw.lng, midLng),
-    2: makeRectPolygon(midLat, ne.lat, midLng, ne.lng),
-    3: makeRectPolygon(sw.lat, midLat, sw.lng, midLng),
-    4: makeRectPolygon(sw.lat, midLat, midLng, ne.lng)
-};
-
-const boundaryTurf = turf.polygon(santaInesBoundary.geometry.coordinates);
-
-for (const purok in quadrantRects) {
-    const clipped = turf.intersect(quadrantRects[purok], boundaryTurf);
-    if (!clipped) continue;
-
+for (const purok in purokBoundaries) {
     const count = purokData[purok] || 0;
     const color = getColor(count);
+    const latlngs = purokBoundaries[purok].map(function(pt) { return [pt[1], pt[0]]; });
 
-    L.geoJSON(clipped, {
-        style: { color: '#555', weight: 1, fillColor: color, fillOpacity: 0.35 }
+    L.polygon(latlngs, {
+        color: '#164430',
+        weight: 1.5,
+        fillColor: color,
+        fillOpacity: 0.55
     }).bindPopup(`<strong>Purok ${purok}</strong><br>Cases: ${count}`).addTo(map);
 }
 
-// One clickable dot per resident, listing all their case records
+L.geoJSON(santaInesBoundary, {
+    style: { color: '#164430', weight: 2.5, fill: false }
+}).addTo(map);
 casePoints.forEach(function(c) {
     let caseListHtml = c.cases.map(function(cs) {
         return `${cs.disease} &mdash; ${cs.date} &mdash; ${cs.status}`;
     }).join('<br>');
 
     L.circleMarker([c.lat, c.lng], {
-        radius: 3,
+        radius: 2,
         color: '#222',
         weight: 1,
         fillColor: '#333',

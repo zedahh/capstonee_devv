@@ -9,6 +9,16 @@ require '../../includes/functions.php';
 
 $error = '';
 $success = '';
+if (isset($_GET['archive'])) {
+    $archive_id = (int) $_GET['archive'];
+    $pdo->prepare("UPDATE infant_records SET is_active = 0 WHERE infant_record_id = ?")->execute([$archive_id]);
+
+    $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, table_name, record_id, details) VALUES (?, 'ARCHIVE', 'infant_records', ?, 'Archived infant record')");
+    $log->execute([$_SESSION['user_id'], $archive_id]);
+
+    header('Location: infant.php');
+    exit;
+}
 
 // Handle new infant registration (creates a resident + infant record together)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -69,6 +79,7 @@ $infants = $pdo->query("
     FROM infant_records
     JOIN residents r ON infant_records.resident_id = r.resident_id
     LEFT JOIN residents m ON infant_records.mother_resident_id = m.resident_id
+    WHERE infant_records.is_active = 1
     ORDER BY r.birth_date DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 

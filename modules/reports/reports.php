@@ -8,14 +8,15 @@ require '../../config/database.php';
 require '../../includes/functions.php';
 
 $total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active = 1")->fetchColumn();
-$total_maternal = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk')")->fetchColumn();
-$total_infants = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)")->fetchColumn();
-$total_vaccinations = $pdo->query("SELECT COUNT(*) FROM vaccination_records")->fetchColumn();
-$total_disease_cases = $pdo->query("SELECT COUNT(*) FROM disease_cases WHERE status IN ('Active', 'Under monitoring')")->fetchColumn();
+$total_maternal = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk') AND is_active = 1")->fetchColumn();
+$total_infants = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) AND ir.is_active = 1")->fetchColumn();
+$total_vaccinations = $pdo->query("SELECT COUNT(*) FROM vaccination_records WHERE is_active = 1")->fetchColumn();
+$total_disease_cases = $pdo->query("SELECT COUNT(*) FROM disease_cases WHERE status IN ('Active', 'Under monitoring') AND is_active = 1")->fetchColumn();
 
 $disease_breakdown = $pdo->query("
     SELECT disease_name, COUNT(*) as total
     FROM disease_cases
+    WHERE is_active = 1
     GROUP BY disease_name
     ORDER BY total DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
@@ -44,7 +45,7 @@ $top_case_combo = $pdo->query("
     SELECT r.purok, dc.disease_name, COUNT(*) as total
     FROM disease_cases dc
     JOIN residents r ON dc.resident_id = r.resident_id
-    WHERE dc.status IN ('Active', 'Under monitoring')
+    WHERE dc.status IN ('Active', 'Under monitoring') AND dc.is_active = 1
     GROUP BY r.purok, dc.disease_name
     ORDER BY total DESC
     LIMIT 1
@@ -59,6 +60,7 @@ $infants_all = $pdo->query("
     SELECT infant_records.infant_record_id, r.birth_date
     FROM infant_records
     JOIN residents r ON infant_records.resident_id = r.resident_id
+    WHERE infant_records.is_active = 1
 ")->fetchAll(PDO::FETCH_ASSOC);
 $fic_complete = 0;
 $fic_overdue = 0;
@@ -75,7 +77,7 @@ if ($fic_total > 0) {
 
 // Prenatal visit compliance summary
 $prenatal_schedule = $pdo->query("SELECT * FROM prenatal_visit_schedule")->fetchAll(PDO::FETCH_ASSOC);
-$maternal_all = $pdo->query("SELECT maternal_record_id, lmp_date, monitoring_status FROM maternal_records")->fetchAll(PDO::FETCH_ASSOC);
+$maternal_all = $pdo->query("SELECT maternal_record_id, lmp_date, monitoring_status FROM maternal_records WHERE is_active = 1")->fetchAll(PDO::FETCH_ASSOC);
 $prenatal_behind = 0;
 $prenatal_total = count($maternal_all);
 foreach ($maternal_all as $mat) {
@@ -90,7 +92,7 @@ if ($prenatal_total > 0) {
 $monthly_totals = $pdo->query("
     SELECT DATE_FORMAT(date_reported, '%Y-%m') as ym, COUNT(*) as total
     FROM disease_cases
-    WHERE date_reported >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH)
+    WHERE date_reported >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) AND is_active = 1
     GROUP BY ym ORDER BY ym
 ")->fetchAll(PDO::FETCH_ASSOC);
 if (count($monthly_totals) >= 2) {

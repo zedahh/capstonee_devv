@@ -268,10 +268,11 @@ if (!isset($records)) { return; }
   </div>
 
   <h5><i class="fa-solid fa-list-check me-2"></i>All vaccination records</h5>
+  <input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Search by infant name...">
   <div class="vaccination-table-card">
   <table class="table table-striped">
     <thead>
-      <tr><th>Infant</th><th>Purok</th><th>Vaccine</th><th>Date given</th><th>Given by</th><th>Notes</th></tr>
+      <tr><th>Infant</th><th>Purok</th><th>Vaccine</th><th>Date given</th><th>Given by</th><th>Notes</th><th>Actions</th></tr>
     </thead>
     <tbody>
       <?php foreach ($records as $rec): ?>
@@ -282,12 +283,22 @@ if (!isset($records)) { return; }
         <td><?= htmlspecialchars($rec['date_administered']) ?></td>
         <td><?= htmlspecialchars($rec['worker_name'] ?? 'Unknown') ?></td>
         <td><?= htmlspecialchars($rec['notes']) ?></td>
+        <td><a href="?archive=<?= $rec['vaccination_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Archive this vaccination record? It will no longer count toward this infant\'s FIC status.')">Archive</a></td>
       </tr>
       <?php endforeach; ?>
     </tbody>
   </table>
   </div>
 </div>
+<script>
+document.getElementById('liveSearch').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.vaccination-table-card tbody tr');
+    rows.forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+    });
+});
+</script>
     </main>
   </div>
 </div>

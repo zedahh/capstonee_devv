@@ -8,6 +8,16 @@ require '../../config/database.php';
 
 $error = '';
 $success = '';
+if (isset($_GET['archive'])) {
+    $archive_id = (int) $_GET['archive'];
+    $pdo->prepare("UPDATE vaccination_records SET is_active = 0 WHERE vaccination_id = ?")->execute([$archive_id]);
+
+    $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, table_name, record_id, details) VALUES (?, 'ARCHIVE', 'vaccination_records', ?, 'Archived vaccination record')");
+    $log->execute([$_SESSION['user_id'], $archive_id]);
+
+    header('Location: vaccination.php');
+    exit;
+}
 
 // Handle new vaccination entry
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -39,6 +49,7 @@ $infants = $pdo->query("
     SELECT infant_records.infant_record_id, r.first_name, r.last_name, r.purok
     FROM infant_records
     JOIN residents r ON infant_records.resident_id = r.resident_id
+    WHERE infant_records.is_active = 1
     ORDER BY r.last_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -49,6 +60,7 @@ $records = $pdo->query("
     JOIN infant_records ON vaccination_records.infant_record_id = infant_records.infant_record_id
     JOIN residents r ON infant_records.resident_id = r.resident_id
     LEFT JOIN users u ON vaccination_records.administered_by = u.user_id
+    WHERE vaccination_records.is_active = 1
     ORDER BY vaccination_records.date_administered DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 

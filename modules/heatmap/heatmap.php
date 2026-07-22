@@ -6,6 +6,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 require '../../config/database.php';
 require '../../includes/functions.php';
+$purok_boundaries_json = json_encode(getPurokBoundaries());
 
 $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
@@ -16,7 +17,7 @@ if ($is_filtered) {
         SELECT r.purok, COUNT(*) as case_count
         FROM disease_cases dc
         JOIN residents r ON dc.resident_id = r.resident_id
-        WHERE dc.date_reported BETWEEN ? AND ?
+        WHERE dc.date_reported BETWEEN ? AND ? AND dc.is_active = 1
         GROUP BY r.purok
     ");
     $stmt->execute([$start_date, $end_date]);
@@ -25,10 +26,9 @@ if ($is_filtered) {
         SELECT r.purok, COUNT(*) as case_count
         FROM disease_cases dc
         JOIN residents r ON dc.resident_id = r.resident_id
-        WHERE dc.status IN ('Active', 'Under monitoring')
+        WHERE dc.status IN ('Active', 'Under monitoring') AND dc.is_active = 1
         GROUP BY r.purok
     ");
-}
 $counts_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $purok_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
@@ -51,7 +51,7 @@ if ($is_filtered) {
         SELECT dc.disease_name, dc.date_reported, dc.status, r.resident_id, r.first_name, r.last_name, r.purok, r.approx_lat, r.approx_lng
         FROM disease_cases dc
         JOIN residents r ON dc.resident_id = r.resident_id
-        WHERE dc.date_reported BETWEEN ? AND ?
+        WHERE dc.date_reported BETWEEN ? AND ? AND dc.is_active = 1
     ");
     $caseStmt->execute([$start_date, $end_date]);
 } else {
@@ -59,7 +59,7 @@ if ($is_filtered) {
         SELECT dc.disease_name, dc.date_reported, dc.status, r.resident_id, r.first_name, r.last_name, r.purok, r.approx_lat, r.approx_lng
         FROM disease_cases dc
         JOIN residents r ON dc.resident_id = r.resident_id
-        WHERE dc.status IN ('Active', 'Under monitoring')
+        WHERE dc.status IN ('Active', 'Under monitoring') AND dc.is_active = 1
     ");
 }
 $cases = $caseStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -94,4 +94,4 @@ foreach ($cases as $c) {
 }
 $case_points = array_values($residents_map);
 
-require 'heatmap_view.php';
+require 'heatmap_view.php'; }

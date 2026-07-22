@@ -10,6 +10,16 @@ $prenatal_schedule = $pdo->query("SELECT * FROM prenatal_visit_schedule")->fetch
 
 $error = '';
 $success = '';
+if (isset($_GET['archive'])) {
+    $archive_id = (int) $_GET['archive'];
+    $pdo->prepare("UPDATE maternal_records SET is_active = 0 WHERE maternal_record_id = ?")->execute([$archive_id]);
+
+    $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, table_name, record_id, details) VALUES (?, 'ARCHIVE', 'maternal_records', ?, 'Archived maternal record')");
+    $log->execute([$_SESSION['user_id'], $archive_id]);
+
+    header('Location: maternal.php');
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $resident_id = $_POST['resident_id'] ?? '';
@@ -42,6 +52,7 @@ $records = $pdo->query("
     SELECT maternal_records.*, residents.first_name, residents.last_name, residents.purok
     FROM maternal_records
     JOIN residents ON maternal_records.resident_id = residents.resident_id
+    WHERE maternal_records.is_active = 1
     ORDER BY maternal_records.created_at DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 

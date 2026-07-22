@@ -315,6 +315,7 @@ if (!isset($infants)) { return; }
   </div>
 
   <h5><i class="fa-solid fa-list-check me-2"></i>All infants (0–12 months)</h5>
+  <input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Search by name...">
   <div class="infants-table-card">
   <table class="table table-striped">
     <thead>
@@ -329,13 +330,25 @@ if (!isset($infants)) { return; }
         <td><?= $i['mother_last'] ? htmlspecialchars($i['mother_last'] . ', ' . $i['mother_first']) : '—' ?></td>
         <td><?php $mstat_class = $i['monitoring_status'] === 'Normal' ? 'status-badge-normal' : ($i['monitoring_status'] === 'Underweight' ? 'status-badge-underweight' : 'status-badge-atrisk'); ?><span class="badge <?= $mstat_class ?>"><?= htmlspecialchars($i['monitoring_status']) ?></span></td>
         <td><span class="badge bg-<?= $fic['badge'] ?>"><?= htmlspecialchars($fic['label']) ?></span></td>
-        <td><a href="growth.php?id=<?= $i['infant_record_id'] ?>" class="btn btn-sm btn-outline-primary">Growth records</a></td>
+        <td>
+          <a href="growth.php?id=<?= $i['infant_record_id'] ?>" class="btn btn-sm btn-outline-primary">Growth records</a>
+          <a href="?archive=<?= $i['infant_record_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Archive this infant record? It will be hidden from the list but not permanently deleted.')">Archive</a>
+        </td>
       </tr>
       <?php endforeach; ?>
     </tbody>
   </table>
   </div>
 </div>
+<script>
+document.getElementById('liveSearch').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.infants-table-card tbody tr');
+    rows.forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+    });
+});
+</script>
     </main>
   </div>
 </div>

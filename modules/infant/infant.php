@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Birth length should realistically be between 25 cm and 60 cm. Please check the value entered.';
     } else {
         // Step 1: create the resident record for this infant
-        $qr_code = uniqid('RES-', true);
+        $qr_code = 'RES-' . bin2hex(random_bytes(12));
         $stmt = $pdo->prepare("INSERT INTO residents 
             (qr_code, first_name, middle_name, last_name, suffix, birth_date, gender, purok)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)");

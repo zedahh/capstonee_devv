@@ -213,20 +213,30 @@ if (!isset($case_points)) { return; }
     <div class="col-auto"><input type="date" name="start_date" class="form-control form-control-sm" value="<?= htmlspecialchars($start_date) ?>"></div>
     <div class="col-auto"><label class="col-form-label col-form-label-sm">To</label></div>
     <div class="col-auto"><input type="date" name="end_date" class="form-control form-control-sm" value="<?= htmlspecialchars($end_date) ?>"></div>
+    <div class="col-auto">
+      <label class="col-form-label col-form-label-sm">Disease</label>
+    </div>
+    <div class="col-auto">
+      <select name="disease" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">All diseases</option>
+        <?php foreach ($available_diseases as $d): ?>
+          <option value="<?= htmlspecialchars($d) ?>" <?= $selected_disease === $d ? 'selected' : '' ?>><?= htmlspecialchars($d) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
     <div class="col-auto"><button type="submit" class="btn btn-sm btn-primary">Apply date range</button></div>
-    <?php if ($is_filtered): ?>
-    <div class="col-auto"><a href="heatmap.php" class="btn btn-sm btn-outline-secondary">Clear (show current)</a></div>
+    <?php if ($is_filtered || $selected_disease !== ''): ?>
+    <div class="col-auto"><a href="heatmap.php" class="btn btn-sm btn-outline-secondary">Clear all filters</a></div>
     <?php endif; ?>
   </form>
 
   <p class="text-muted small mb-3">
     <?php if ($is_filtered): ?>
-      Showing all cases reported between <strong><?= htmlspecialchars($start_date) ?></strong> and <strong><?= htmlspecialchars($end_date) ?></strong>.
+      Showing<?= $selected_disease !== '' ? ' <strong>' . htmlspecialchars($selected_disease) . '</strong>' : '' ?> cases reported between <strong><?= htmlspecialchars($start_date) ?></strong> and <strong><?= htmlspecialchars($end_date) ?></strong>.
     <?php else: ?>
-      Showing current <strong>active / under-monitoring</strong> cases. Click a dot to see case details.
+      Showing current <strong><?= $selected_disease !== '' ? htmlspecialchars($selected_disease) : 'active / under-monitoring' ?></strong> cases. Click a dot to see case details.
     <?php endif; ?>
   </p>
-
   <div class="row">
     <div class="col-md-8">
       <div class="map-card">

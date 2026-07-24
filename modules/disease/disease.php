@@ -10,6 +10,16 @@ $error = '';
 $success = '';
 $edit_case = null;
 
+// Pick up one-time flash messages left by a redirect (see Post/Redirect/Get below)
+if (isset($_SESSION['flash_success'])) {
+    $success = $_SESSION['flash_success'];
+    unset($_SESSION['flash_success']);
+}
+if (isset($_SESSION['flash_error'])) {
+    $error = $_SESSION['flash_error'];
+    unset($_SESSION['flash_error']);
+}
+
 if (isset($_GET['archive'])) {
     $archive_id = (int) $_GET['archive'];
     $pdo->prepare("UPDATE disease_cases SET is_active = 0 WHERE case_id = ?")->execute([$archive_id]);
@@ -48,7 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, table_name, record_id, details) VALUES (?, 'UPDATE', 'disease_cases', ?, ?)");
         $log->execute([$_SESSION['user_id'], $case_id, "Updated case: $disease_name (status: $status)"]);
 
-        $success = 'Case updated successfully.';
+        $_SESSION['flash_success'] = 'Case updated successfully.';
+        header('Location: disease.php');
+        exit;
     } else {
         // INSERT new case
         $stmt = $pdo->prepare("INSERT INTO disease_cases (resident_id, disease_name, date_reported, status, notes, recorded_by) VALUES (?, ?, ?, ?, ?, ?)");
@@ -58,7 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, table_name, record_id, details) VALUES (?, 'INSERT', 'disease_cases', ?, ?)");
         $log->execute([$_SESSION['user_id'], $new_id, "Recorded case: $disease_name"]);
 
-        $success = 'Case recorded successfully.';
+        $_SESSION['flash_success'] = 'Case recorded successfully.';
+        header('Location: disease.php');
+        exit;
     }
 }
 

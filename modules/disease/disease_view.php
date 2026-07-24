@@ -128,6 +128,8 @@ if (!isset($cases)) { return; }
   .btn-outline-secondary:hover { background: var(--bhms-gray-600); border-color: var(--bhms-gray-600); }
   .btn-outline-primary { color: var(--bhms-green-dark); border-color: var(--bhms-green); }
   .btn-outline-primary:hover { background: var(--bhms-green); border-color: var(--bhms-green); }
+  .btn-outline-danger { color: var(--bhms-danger); border-color: var(--bhms-danger); }
+  .btn-outline-danger:hover { background: var(--bhms-danger); border-color: var(--bhms-danger); }
   .alert { border: none; border-left: 4px solid transparent; border-radius: var(--bhms-radius-sm); font-size: 0.9rem; padding: 0.9rem 1.1rem; }
   .alert-danger { background: var(--bhms-danger-light); color: #8a2c2c; border-left-color: var(--bhms-danger); }
   .alert-success { background: var(--bhms-success-light); color: var(--bhms-green-darker); border-left-color: var(--bhms-green); }
@@ -177,6 +179,82 @@ if (!isset($cases)) { return; }
   .status-badge-active { background: var(--bhms-danger-light); color: #8a2c2c; }
   .status-badge-monitoring { background: var(--bhms-warning-light); color: #8a5a12; }
   .status-badge-recovered { background: var(--bhms-success-light); color: var(--bhms-green-darker); }
+
+  input#case_purok_display { background: var(--bhms-gray-50); color: var(--bhms-gray-600); font-weight: 500; cursor: not-allowed; }
+
+  /* Floating toast notifications (centered) */
+  .bhms-toast-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,24,28,0.45);
+    z-index: 1999;
+    animation: bhmsBackdropIn 0.2s ease;
+  }
+  .bhms-toast-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: calc(100% - 48px);
+    max-width: 420px;
+  }
+  .bhms-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: #fff;
+    border-radius: var(--bhms-radius-lg);
+    box-shadow: var(--bhms-shadow-md);
+    padding: 1.25rem 1.4rem;
+    border-left: 4px solid transparent;
+    animation: bhmsToastIn 0.25s ease;
+  }
+  .bhms-toast-danger { border-left-color: var(--bhms-danger); }
+  .bhms-toast-success { border-left-color: var(--bhms-green); }
+  .bhms-toast-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .bhms-toast-danger .bhms-toast-icon { color: var(--bhms-danger); }
+  .bhms-toast-success .bhms-toast-icon { color: var(--bhms-green); }
+  .bhms-toast-body { flex: 1 1 auto; min-width: 0; }
+  .bhms-toast-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
+  .bhms-toast-danger .bhms-toast-title { color: #8a2c2c; }
+  .bhms-toast-success .bhms-toast-title { color: var(--bhms-green-darker); }
+  .bhms-toast-message { font-size: 0.88rem; color: var(--bhms-gray-600); line-height: 1.45; word-break: break-word; }
+  .bhms-toast-ok {
+    display: block;
+    margin-left: auto;
+    margin-top: 0.9rem;
+    border: none;
+    background: linear-gradient(135deg, var(--bhms-green), var(--bhms-blue));
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 0.4rem 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+  }
+  .bhms-toast-ok:hover { filter: brightness(0.95); }
+  .bhms-toast-content { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
+  .bhms-toast-row { display: flex; align-items: flex-start; gap: 0.75rem; }
+  .bhms-toast.bhms-toast-hide { animation: bhmsToastOut 0.18s ease forwards; }
+  .bhms-toast-backdrop.bhms-toast-hide { animation: bhmsBackdropOut 0.18s ease forwards; }
+  @keyframes bhmsToastIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes bhmsToastOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.92); }
+  }
+  @keyframes bhmsBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes bhmsBackdropOut { from { opacity: 1; } to { opacity: 0; } }
+  @media (max-width: 576px) {
+    .bhms-toast-container { width: calc(100% - 32px); }
+  }
 </style>
 </head>
 <body class="bhms-app-body">
@@ -222,31 +300,75 @@ if (!isset($cases)) { return; }
       </div>
     </header>
     <main class="bhms-content">
+
+<?php if ($error || $success): ?>
+<div class="bhms-toast-backdrop" id="bhmsToastBackdrop"></div>
+<div class="bhms-toast-container" id="bhmsToastContainer">
+  <?php if ($error): ?>
+  <div class="bhms-toast bhms-toast-danger" id="bhmsToastError">
+    <div class="bhms-toast-content">
+      <div class="bhms-toast-row">
+        <div class="bhms-toast-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+        <div class="bhms-toast-body">
+          <div class="bhms-toast-title">Something went wrong</div>
+          <div class="bhms-toast-message"><?= htmlspecialchars($error) ?></div>
+        </div>
+      </div>
+      <button type="button" class="bhms-toast-ok" onclick="bhmsDismissToast('bhmsToastError')">OK</button>
+    </div>
+  </div>
+  <?php endif; ?>
+  <?php if ($success): ?>
+  <div class="bhms-toast bhms-toast-success" id="bhmsToastSuccess">
+    <div class="bhms-toast-content">
+      <div class="bhms-toast-row">
+        <div class="bhms-toast-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="bhms-toast-body">
+          <div class="bhms-toast-title">Success</div>
+          <div class="bhms-toast-message"><?= htmlspecialchars($success) ?></div>
+        </div>
+      </div>
+      <button type="button" class="bhms-toast-ok" onclick="bhmsDismissToast('bhmsToastSuccess')">OK</button>
+    </div>
+  </div>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
+
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h3><i class="fa-solid fa-virus me-2" style="color:var(--bhms-green);"></i>Disease and Illness Case Recording</h3>
     <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
   </div>
 
-  <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-  <?php if ($success): ?><div class="alert alert-success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
-
   <div class="card mb-4">
     <div class="card-body">
       <h5 class="card-title"><i class="fa-solid <?= $edit_case ? 'fa-pen-to-square' : 'fa-notes-medical' ?> me-2"></i><?= $edit_case ? 'Update case' : 'Record new case' ?></h5>
-      <form method="POST" action="">
+      <form method="POST" action="" id="diseaseForm">
         <input type="hidden" name="case_id" value="<?= htmlspecialchars($edit_case['case_id'] ?? '') ?>">
         <div class="row g-3">
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-label">Resident</label>
-            <select name="resident_id" class="form-select" required>
+            <select name="resident_id" id="case_resident_id" class="form-select" required>
               <option value="">Select resident</option>
               <?php foreach ($residents as $r): ?>
-                <option value="<?= $r['resident_id'] ?>" <?= (string)($edit_case['resident_id'] ?? '') === (string)$r['resident_id'] ? 'selected' : '' ?>>
-                  <?= htmlspecialchars($r['last_name'] . ', ' . $r['first_name']) ?> (Purok <?= $r['purok'] ?>)
+                <option value="<?= $r['resident_id'] ?>" data-purok="<?= htmlspecialchars($r['purok']) ?>" <?= (string)($edit_case['resident_id'] ?? '') === (string)$r['resident_id'] ? 'selected' : '' ?>>
+                  <?= htmlspecialchars($r['last_name'] . ', ' . $r['first_name']) ?>
                 </option>
               <?php endforeach; ?>
             </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Purok<?= $edit_case ? ' <span class="text-muted" style="font-weight:400;"></span>' : '' ?></label>
+            <?php if ($edit_case): ?>
+            <select name="purok" id="case_purok_display" class="form-select">
+              <?php for ($p = 1; $p <= 4; $p++): ?>
+              <option value="<?= $p ?>">Purok <?= $p ?></option>
+              <?php endfor; ?>
+            </select>
+            <?php else: ?>
+            <input type="text" id="case_purok_display" class="form-control" placeholder="—" readonly tabindex="-1">
+            <?php endif; ?>
           </div>
           <div class="col-md-4">
             <label class="form-label">Disease name</label>
@@ -258,7 +380,7 @@ if (!isset($cases)) { return; }
             <input type="date" name="date_reported" class="form-control" required
               value="<?= htmlspecialchars($edit_case['date_reported'] ?? '') ?>">
           </div>
-          <div class="col-md-2">
+          <div class="col-md-1">
             <label class="form-label">Status</label>
             <select name="status" class="form-select">
               <option value="Active" <?= ($edit_case['status'] ?? '') === 'Active' ? 'selected' : '' ?>>Active</option>
@@ -271,7 +393,7 @@ if (!isset($cases)) { return; }
             <textarea name="notes" class="form-control" rows="2"><?= htmlspecialchars($edit_case['notes'] ?? '') ?></textarea>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3"><i class="fa-solid <?= $edit_case ? 'fa-floppy-disk' : 'fa-plus' ?> me-2"></i><?= $edit_case ? 'Update case' : 'Record case' ?></button>
+        <button type="submit" id="diseaseSubmitBtn" class="btn btn-primary mt-3"><i class="fa-solid <?= $edit_case ? 'fa-floppy-disk' : 'fa-plus' ?> me-2"></i><?= $edit_case ? 'Update case' : 'Record case' ?></button>
         <?php if ($edit_case): ?>
           <a href="disease.php" class="btn btn-outline-secondary mt-3">Cancel edit</a>
         <?php endif; ?>
@@ -312,6 +434,63 @@ document.getElementById('liveSearch').addEventListener('input', function() {
         row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
     });
 });
+</script>
+<script>
+document.getElementById('case_resident_id').addEventListener('change', function() {
+    const selected = this.options[this.selectedIndex];
+    const purok = selected.getAttribute('data-purok');
+    const purokField = document.getElementById('case_purok_display');
+    if (purokField.tagName === 'SELECT') {
+        purokField.value = purok || '';
+    } else {
+        purokField.value = purok ? ('Purok ' + purok) : '';
+    }
+});
+<?php if ($edit_case): ?>
+document.getElementById('case_resident_id').dispatchEvent(new Event('change'));
+<?php endif; ?>
+</script>
+<script>
+document.getElementById('diseaseForm')?.addEventListener('submit', function () {
+  var btn = document.getElementById('diseaseSubmitBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Please wait...';
+  }
+});
+</script>
+<script>
+function bhmsDismissToast(id) {
+  var el = document.getElementById(id);
+  if (!el) { return; }
+  el.classList.add('bhms-toast-hide');
+  el.addEventListener('animationend', function () {
+    el.remove();
+    var container = document.getElementById('bhmsToastContainer');
+    var backdrop = document.getElementById('bhmsToastBackdrop');
+    if (backdrop && container && container.children.length === 0) {
+      backdrop.classList.add('bhms-toast-hide');
+      backdrop.addEventListener('animationend', function () {
+        backdrop.remove();
+      }, { once: true });
+    }
+  }, { once: true });
+}
+document.getElementById('bhmsToastBackdrop')?.addEventListener('click', function () {
+  document.querySelectorAll('#bhmsToastContainer .bhms-toast').forEach(function (t) {
+    bhmsDismissToast(t.id);
+  });
+});
+// Auto-dismiss every toast after 3 seconds
+document.querySelectorAll('#bhmsToastContainer .bhms-toast').forEach(function (toast) {
+  setTimeout(function () {
+    bhmsDismissToast(toast.id);
+  }, 3000);
+});
+<?php if ($success): ?>
+document.getElementById('diseaseForm')?.reset();
+document.getElementById('case_purok_display').value = '';
+<?php endif; ?>
 </script>
     </main>
   </div>

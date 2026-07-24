@@ -28,7 +28,7 @@ if (!isset($code)) { return; }
   body.bg-light {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #2C333A;
-    background: linear-gradient(160deg, #f4faf7 0%, #f7f9fa 45%, #eaf2fb 100%) !important;
+    background: linear-gradient(160deg, #eef4fc 0%, #f7f9fa 45%, #eaf2fb 100%) !important;
     min-height: 100vh;
   }
   h1,h2,h3,h4,h5,h6 { font-family: 'Poppins', sans-serif; font-weight: 600; color: #2C333A; }
@@ -43,7 +43,7 @@ if (!isset($code)) { return; }
   .record-icon-badge {
     width: 58px; height: 58px;
     border-radius: 16px;
-    background: linear-gradient(135deg, #2E7D52, #185FA5);
+    background: linear-gradient(135deg, #1B5FC0, #123F87);
     color: #fff;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.5rem;
@@ -59,7 +59,7 @@ if (!isset($code)) { return; }
 
   .btn { border-radius: 10px; font-weight: 500; transition: transform 0.12s ease, box-shadow 0.12s ease; }
   .btn-primary {
-    background: linear-gradient(135deg, #2E7D52, #185FA5);
+    background: linear-gradient(135deg, #1B5FC0, #123F87);
     border: none;
   }
   .btn-primary:hover, .btn-primary:focus {
@@ -75,8 +75,8 @@ if (!isset($code)) { return; }
     border: 1px solid #D3D9DE;
   }
   .form-control:focus {
-    border-color: #2E7D52;
-    box-shadow: 0 0 0 3px rgba(46,125,82,0.14);
+    border-color: #1B5FC0;
+    box-shadow: 0 0 0 3px rgba(27,95,192,0.14);
   }
   .input-group .btn-primary { border-radius: 0 10px 10px 0; }
   .input-group .form-control { border-radius: 10px 0 0 10px; }
@@ -91,8 +91,8 @@ if (!isset($code)) { return; }
   .badge { font-weight: 600; padding: 0.4em 0.75em; border-radius: 999px; font-size: 0.72rem; }
 
   .table thead th {
-    background: linear-gradient(135deg, #E6F4EC, #eaf2fb);
-    color: #1F5C3B;
+    background: linear-gradient(135deg, #EAF2FF, #eaf2fb);
+    color: #123F87;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -103,7 +103,7 @@ if (!isset($code)) { return; }
   .resident-name-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; }
   .resident-icon {
     width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
-    background: linear-gradient(135deg, #2E7D52, #185FA5);
+    background: linear-gradient(135deg, #1B5FC0, #123F87);
     color: #fff; display: flex; align-items: center; justify-content: center;
     font-size: 1.05rem;
   }

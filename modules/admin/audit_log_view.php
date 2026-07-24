@@ -13,12 +13,10 @@
 <link href="../../assets/css/custom.css" rel="stylesheet">
 <style>
   :root {
-    --bhms-green: #2E7D52;
-    --bhms-green-dark: #1F5C3B;
-    --bhms-green-darker: #164430;
-    --bhms-green-light: #E6F4EC;
-    --bhms-blue: #185FA5;
-    --bhms-blue-dark: #0F477F;
+    --bhms-blue: #1B5FC0;
+    --bhms-blue-dark: #123F87;
+    --bhms-blue-darker: #0B2C61;
+    --bhms-blue-light: #EAF2FF;
     --bhms-gray-50: #F7F9FA;
     --bhms-gray-100: #EEF1F3;
     --bhms-gray-200: #E3E7EA;
@@ -38,7 +36,7 @@
   body.bhms-app-body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: var(--bhms-gray-800);
-    background: linear-gradient(160deg, #f4faf7 0%, #f7f9fa 45%, #eaf2fb 100%);
+    background: linear-gradient(160deg, #eef4fc 0%, #f7f9fa 45%, #eaf2fb 100%);
     -webkit-font-smoothing: antialiased;
   }
   h1,h2,h3,h4,h5,h6 { font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--bhms-gray-800); }
@@ -52,7 +50,7 @@
     width: var(--bhms-sidebar-width);
     position: fixed; top: 0; left: 0; bottom: 0;
     display: flex; flex-direction: column;
-    background: linear-gradient(180deg, var(--bhms-green-darker) 0%, var(--bhms-green-dark) 55%, var(--bhms-green) 100%);
+    background: linear-gradient(180deg, var(--bhms-blue-darker) 0%, var(--bhms-blue-dark) 55%, var(--bhms-blue) 100%);
     color: #fff; z-index: 1030;
     transition: transform 0.25s ease;
   }
@@ -72,7 +70,7 @@
   }
   .bhms-nav-link i { width: 18px; text-align: center; font-size: 0.95rem; }
   .bhms-nav-link:hover { background: rgba(255,255,255,0.12); color: #fff; }
-  .bhms-nav-link.active { background: #fff; color: var(--bhms-green-dark); font-weight: 600; box-shadow: var(--bhms-shadow-sm); }
+  .bhms-nav-link.active { background: #fff; color: var(--bhms-blue-dark); font-weight: 600; box-shadow: var(--bhms-shadow-sm); }
   .bhms-nav-divider { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6; padding: 0.85rem 0.9rem 0.3rem; }
   .bhms-sidebar-footer { padding: 0.85rem 0.75rem; border-top: 1px solid rgba(255,255,255,0.14); }
   .bhms-logout-link:hover { background: rgba(214,69,69,0.4); }
@@ -82,12 +80,12 @@
     height: var(--bhms-topbar-height); background: #fff; border-bottom: 1px solid var(--bhms-gray-200);
     display: flex; align-items: center; gap: 1rem; padding: 0 1.5rem; position: sticky; top: 0; z-index: 900;
   }
-  .bhms-menu-btn { display: none; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: var(--bhms-radius-sm); color: var(--bhms-green-dark); font-size: 1.05rem; cursor: pointer; flex-shrink: 0; }
+  .bhms-menu-btn { display: none; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: var(--bhms-radius-sm); color: var(--bhms-blue-dark); font-size: 1.05rem; cursor: pointer; flex-shrink: 0; }
   .bhms-menu-btn:hover { background: var(--bhms-gray-100); }
   .bhms-topbar-title { font-weight: 600; font-size: 1.02rem; color: var(--bhms-gray-800); flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .bhms-topbar-user { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--bhms-gray-600); white-space: nowrap; }
   .bhms-topbar-user i { font-size: 1.3rem; color: var(--bhms-gray-400); }
-  .bhms-topbar-user .bhms-role-pill { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; background: var(--bhms-green-light); color: var(--bhms-green-dark); padding: 0.15rem 0.55rem; border-radius: 999px; font-weight: 600; }
+  .bhms-topbar-user .bhms-role-pill { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; background: var(--bhms-blue-light); color: var(--bhms-blue-dark); padding: 0.15rem 0.55rem; border-radius: 999px; font-weight: 600; }
   .bhms-content { flex: 1 1 auto; padding-bottom: 2rem; }
 
   @media (max-width: 992px) {
@@ -129,8 +127,8 @@
   }
   .table { margin-bottom: 0; border-collapse: separate; border-spacing: 0; }
   .table thead th {
-    background: linear-gradient(135deg, var(--bhms-green-light), #eaf2fb);
-    color: var(--bhms-green-dark);
+    background: linear-gradient(135deg, var(--bhms-blue-light), #eaf2fb);
+    color: var(--bhms-blue-dark);
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -146,7 +144,7 @@
     border-color: var(--bhms-gray-100);
   }
   .table-striped > tbody > tr:nth-of-type(odd) > * { background-color: var(--bhms-gray-50); }
-  .table > tbody > tr:hover > * { background-color: var(--bhms-green-light); }
+  .table > tbody > tr:hover > * { background-color: var(--bhms-blue-light); }
 </style>
 </head>
 <body class="bhms-app-body">
@@ -194,7 +192,7 @@
     <main class="bhms-content">
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3><i class="fa-solid fa-clipboard-list me-2" style="color:var(--bhms-green);"></i>Audit log</h3>
+    <h3><i class="fa-solid fa-clipboard-list me-2" style="color:var(--bhms-blue);"></i>Audit log</h3>
     <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
   </div>
 

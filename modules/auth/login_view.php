@@ -23,7 +23,7 @@
     align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
-    background: linear-gradient(160deg, #f4faf7 0%, #eef6fb 50%, #eaf2fb 100%);
+    background: linear-gradient(160deg, #eef4fc 0%, #eef6fb 50%, #eaf2fb 100%);
   }
   .login-blob {
     position: absolute;
@@ -32,9 +32,9 @@
     pointer-events: none;
     animation: bhmsFloat 10s ease-in-out infinite;
   }
-  .login-blob-1 { width: 420px; height: 420px; background: #2E7D52; top: -140px; left: -120px; opacity: 0.28; }
-  .login-blob-2 { width: 380px; height: 380px; background: #185FA5; bottom: -160px; right: -100px; opacity: 0.22; animation-delay: -3s; }
-  .login-blob-3 { width: 220px; height: 220px; background: #D6336C; top: 55%; left: 8%; opacity: 0.12; animation-delay: -6s; }
+  .login-blob-1 { width: 420px; height: 420px; background: #1B5FC0; top: -140px; left: -120px; opacity: 0.28; }
+  .login-blob-2 { width: 380px; height: 380px; background: #4C8DF6; bottom: -160px; right: -100px; opacity: 0.22; animation-delay: -3s; }
+  .login-blob-3 { width: 220px; height: 220px; background: #123F87; top: 55%; left: 8%; opacity: 0.12; animation-delay: -6s; }
   @keyframes bhmsFloat {
     0%, 100% { transform: translate(0, 0) scale(1); }
     50% { transform: translate(20px, -25px) scale(1.05); }
@@ -56,13 +56,13 @@
     width: 78px; height: 78px;
     margin: 0 auto 1.25rem;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(46,125,82,0.15), rgba(24,95,165,0.15));
+    background: linear-gradient(135deg, rgba(27,95,192,0.15), rgba(18,63,135,0.15));
     display: flex; align-items: center; justify-content: center;
   }
   .login-icon-badge {
     width: 58px; height: 58px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #2E7D52, #185FA5);
+    background: linear-gradient(135deg, #1B5FC0, #123F87);
     color: #fff;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.5rem;
@@ -93,7 +93,7 @@
   }
   .login-password-toggle:hover { color: #5C6670; }
   .login-submit-btn {
-    background: linear-gradient(135deg, #2E7D52, #185FA5);
+    background: linear-gradient(135deg, #1B5FC0, #123F87);
     border: none;
     display: flex;
     align-items: center;
@@ -104,7 +104,7 @@
     border-radius: 10px;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-  .login-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(24, 95, 165, 0.28); color: #fff; }
+  .login-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(27, 95, 192, 0.28); color: #fff; }
   .login-btn-arrow { transition: transform 0.2s ease; }
   .login-submit-btn:hover .login-btn-arrow { transform: translateX(4px); }
   .login-badges {
@@ -126,7 +126,7 @@
     align-items: center;
     gap: 0.35rem;
   }
-  .login-badges i { color: #2E7D52; font-size: 0.75rem; }
+  .login-badges i { color: #1B5FC0; font-size: 0.75rem; }
   .login-record-link a { font-size: 0.85rem; }
   @media (prefers-reduced-motion: reduce) {
     .login-blob, .login-glass-card { animation: none; }

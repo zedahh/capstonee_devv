@@ -13,12 +13,11 @@
 <link href="../../assets/css/custom.css" rel="stylesheet">
 <style>
   :root {
-    --bhms-green: #2E7D52;
-    --bhms-green-dark: #1F5C3B;
-    --bhms-green-darker: #164430;
-    --bhms-green-light: #E6F4EC;
-    --bhms-blue: #185FA5;
-    --bhms-blue-light: #E8F1FA;
+    --bhms-blue: #1B5FC0;
+    --bhms-blue-dark: #123F87;
+    --bhms-blue-darker: #0B2C61;
+    --bhms-blue-light: #EAF2FF;
+    --bhms-indigo: #2B4C8C;
     --bhms-gray-600: #5C6670;
     --bhms-gray-800: #2C333A;
     --bhms-gray-200: #E3E7EA;
@@ -31,12 +30,12 @@
   body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: var(--bhms-gray-800);
-    background: linear-gradient(160deg, #f4faf7 0%, #f7f9fa 45%, #eaf2fb 100%);
+    background: linear-gradient(160deg, #eef4fc 0%, #f7f9fa 45%, #eaf2fb 100%);
     -webkit-font-smoothing: antialiased;
   }
 
   .masthead {
-    background: linear-gradient(135deg, var(--bhms-green-darker) 0%, var(--bhms-green-dark) 55%, var(--bhms-green) 100%);
+    background: linear-gradient(135deg, var(--bhms-blue-darker) 0%, var(--bhms-blue-dark) 55%, var(--bhms-blue) 100%);
     color: #fff;
     padding: 2.75rem 1.5rem 3.5rem;
     text-align: center;
@@ -83,22 +82,22 @@
     background: #fff;
     border-radius: var(--bhms-radius);
     box-shadow: var(--bhms-shadow-sm);
-    border-left: 4px solid var(--bhms-green);
+    border-left: 4px solid var(--bhms-blue);
     padding: 1.25rem 1.4rem;
     margin-bottom: 1rem;
   }
-  .announcement-card.purok-scoped { border-left-color: var(--bhms-blue); }
+  .announcement-card.purok-scoped { border-left-color: var(--bhms-indigo); }
   .announcement-top { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.6rem; }
   .announcement-icon {
     width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-    background: linear-gradient(135deg, var(--bhms-green), var(--bhms-blue));
+    background: linear-gradient(135deg, var(--bhms-blue), var(--bhms-blue-dark));
     color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
   }
   .announcement-card h6 { font-weight: 600; margin-bottom: 0.15rem; }
   .announcement-meta { font-size: 0.76rem; color: var(--bhms-gray-600); display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
   .purok-badge {
     font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px;
-    background: var(--bhms-green-light); color: var(--bhms-green-darker);
+    background: var(--bhms-blue-light); color: var(--bhms-blue-dark);
   }
   .announcement-card p.content-text { font-size: 0.92rem; color: var(--bhms-gray-800); margin: 0.5rem 0 0; line-height: 1.55; }
 

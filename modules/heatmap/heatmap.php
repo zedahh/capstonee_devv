@@ -11,24 +11,38 @@ $purok_boundaries_json = json_encode(getPurokBoundaries());
 $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
 $is_filtered = ($start_date !== '' && $end_date !== '');
+$selected_disease = trim($_GET['disease'] ?? '');
+
+// List of diseases actually on record, for the filter dropdown
+$available_diseases = $pdo->query("SELECT DISTINCT disease_name FROM disease_cases WHERE is_active = 1 ORDER BY disease_name")->fetchAll(PDO::FETCH_COLUMN);
+
+// Build the WHERE clause once, shared by both queries below
+$where_conditions = ['dc.is_active = 1'];
+$params = [];
 
 if ($is_filtered) {
-    $stmt = $pdo->prepare("
-        SELECT r.purok, COUNT(*) as case_count
-        FROM disease_cases dc
-        JOIN residents r ON dc.resident_id = r.resident_id
-        WHERE dc.date_reported BETWEEN ? AND ? AND dc.is_active = 1
-        GROUP BY r.purok
-    ");
-    $stmt->execute([$start_date, $end_date]);
+    $where_conditions[] = 'dc.date_reported BETWEEN ? AND ?';
+    $params[] = $start_date;
+    $params[] = $end_date;
 } else {
-    $stmt = $pdo->query("
-        SELECT r.purok, COUNT(*) as case_count
-        FROM disease_cases dc
-        JOIN residents r ON dc.resident_id = r.resident_id
-        WHERE dc.status IN ('Active', 'Under monitoring') AND dc.is_active = 1
-        GROUP BY r.purok
-    ");
+    $where_conditions[] = "dc.status IN ('Active', 'Under monitoring')";
+}
+
+if ($selected_disease !== '') {
+    $where_conditions[] = 'dc.disease_name = ?';
+    $params[] = $selected_disease;
+}
+
+$where_clause = implode(' AND ', $where_conditions);
+
+$stmt = $pdo->prepare("
+    SELECT r.purok, COUNT(*) as case_count
+    FROM disease_cases dc
+    JOIN residents r ON dc.resident_id = r.resident_id
+    WHERE $where_clause
+    GROUP BY r.purok
+");
+$stmt->execute($params);
 $counts_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $purok_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
@@ -61,23 +75,14 @@ function getRiskLevel($count, $population) {
 $ranking = $purok_counts;
 arsort($ranking);
 
-// Fetch individual active cases with resident info, for the clickable dots
-if ($is_filtered) {
-    $caseStmt = $pdo->prepare("
-        SELECT dc.disease_name, dc.date_reported, dc.status, r.resident_id, r.first_name, r.last_name, r.purok, r.approx_lat, r.approx_lng
-        FROM disease_cases dc
-        JOIN residents r ON dc.resident_id = r.resident_id
-        WHERE dc.date_reported BETWEEN ? AND ? AND dc.is_active = 1
-    ");
-    $caseStmt->execute([$start_date, $end_date]);
-} else {
-    $caseStmt = $pdo->query("
-        SELECT dc.disease_name, dc.date_reported, dc.status, r.resident_id, r.first_name, r.last_name, r.purok, r.approx_lat, r.approx_lng
-        FROM disease_cases dc
-        JOIN residents r ON dc.resident_id = r.resident_id
-        WHERE dc.status IN ('Active', 'Under monitoring') AND dc.is_active = 1
-    ");
-}
+// Fetch individual cases with resident info, for the clickable dots (same filters applied)
+$caseStmt = $pdo->prepare("
+    SELECT dc.disease_name, dc.date_reported, dc.status, r.resident_id, r.first_name, r.last_name, r.purok, r.approx_lat, r.approx_lng
+    FROM disease_cases dc
+    JOIN residents r ON dc.resident_id = r.resident_id
+    WHERE $where_clause
+");
+$caseStmt->execute($params);
 $cases = $caseStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Generate and save an approximate location for any resident who doesn't have one yet,
@@ -111,4 +116,4 @@ foreach ($cases as $c) {
 $case_points = array_values($residents_map);
 $purok_population_json = json_encode($purok_population);
 
-require 'heatmap_view.php'; }
+require 'heatmap_view.php';

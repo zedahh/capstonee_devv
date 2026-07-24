@@ -1,9 +1,14 @@
 <?php
+/** @var array $available_diseases */
 /** @var array $case_points */
 /** @var string $end_date */
 /** @var bool $is_filtered */
+/** @var string $purok_boundaries_json */
 /** @var array $purok_counts */
+/** @var array $purok_population */
+/** @var string $purok_population_json */
 /** @var array $ranking */
+/** @var string $selected_disease */
 /** @var string $start_date */
 if (!isset($case_points)) { return; }
 ?>

@@ -1,17 +1,10 @@
-<?php
-/** @var array $cases */
-/** @var array|null $edit_case */
-/** @var string $error */
-/** @var array $residents */
-/** @var string $success */
-if (!isset($cases)) { return; }
-?>
+<?php if (!isset($archived_items)) { return; } ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Disease and Illness Case Recording</title>
+<title>Archive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -35,14 +28,13 @@ if (!isset($cases)) { return; }
     --bhms-gray-800: #2C333A;
     --bhms-danger: #D64545;
     --bhms-danger-light: #FBEAEA;
-    --bhms-warning: #E0932E;
-    --bhms-warning-light: #FDF2E4;
     --bhms-success-light: #E6F4EC;
     --bhms-radius-lg: 16px;
     --bhms-radius: 12px;
     --bhms-radius-sm: 8px;
     --bhms-shadow-sm: 0 1px 3px rgba(30,41,59,0.06), 0 1px 2px rgba(30,41,59,0.08);
     --bhms-shadow-md: 0 8px 24px rgba(30,41,59,0.10);
+    --bhms-shadow-lg: 0 16px 40px rgba(30,41,59,0.16);
     --bhms-sidebar-width: 264px;
     --bhms-topbar-height: 68px;
   }
@@ -57,7 +49,6 @@ if (!isset($cases)) { return; }
   a { color: var(--bhms-blue); text-decoration: none; }
   a:hover { color: var(--bhms-blue-dark); }
 
- 
   .bhms-shell { display: flex; min-height: 100vh; }
   .bhms-sidebar-checkbox { display: none; }
   .bhms-sidebar {
@@ -114,31 +105,23 @@ if (!isset($cases)) { return; }
     .bhms-topbar-user span:not(.bhms-role-pill) { display: none; }
   }
 
- 
-  .card { border: 1px solid var(--bhms-gray-200); border-radius: var(--bhms-radius); box-shadow: var(--bhms-shadow-sm); transition: box-shadow 0.2s ease; }
-  .card:hover { box-shadow: var(--bhms-shadow-md); }
+  .card { border: 1px solid var(--bhms-gray-200); border-radius: var(--bhms-radius); box-shadow: var(--bhms-shadow-sm); }
   .card-body { padding: 1.5rem; }
-  .card-title { font-weight: 600; color: var(--bhms-gray-800); margin-bottom: 1rem; display: flex; align-items: center; }
-  .btn { border-radius: 10px; font-weight: 500; padding: 0.5rem 1.1rem; font-size: 0.88rem; transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease, border-color 0.15s ease; }
+  .btn { border-radius: 10px; font-weight: 500; padding: 0.5rem 1.1rem; font-size: 0.88rem; }
   .btn-sm { padding: 0.32rem 0.75rem; font-size: 0.8rem; border-radius: 8px; }
-  .btn:active { transform: translateY(1px); }
-  .btn-primary { background: linear-gradient(135deg, var(--bhms-blue), var(--bhms-blue-dark)); border: none; }
-  .btn-primary:hover, .btn-primary:focus { filter: brightness(0.95); transform: translateY(-1px); box-shadow: var(--bhms-shadow-md); color: #fff; }
   .btn-outline-secondary { color: var(--bhms-gray-600); border-color: var(--bhms-gray-300); }
   .btn-outline-secondary:hover { background: var(--bhms-gray-600); border-color: var(--bhms-gray-600); }
   .btn-outline-primary { color: var(--bhms-blue-dark); border-color: var(--bhms-blue); }
   .btn-outline-primary:hover { background: var(--bhms-blue); border-color: var(--bhms-blue); }
+  .btn-outline-danger { color: var(--bhms-danger); border-color: var(--bhms-danger); }
+  .btn-outline-danger:hover { background: var(--bhms-danger); border-color: var(--bhms-danger); }
   .alert { border: none; border-left: 4px solid transparent; border-radius: var(--bhms-radius-sm); font-size: 0.9rem; padding: 0.9rem 1.1rem; }
   .alert-danger { background: var(--bhms-danger-light); color: #8a2c2c; border-left-color: var(--bhms-danger); }
   .alert-success { background: var(--bhms-success-light); color: var(--bhms-success-darker); border-left-color: var(--bhms-success); }
-  .form-label { font-weight: 500; font-size: 0.85rem; color: var(--bhms-gray-600); margin-bottom: 0.35rem; }
-  .form-control, .form-select {
-    border-radius: 10px; border: 1px solid var(--bhms-gray-300); padding: 0.55rem 0.9rem; font-size: 0.9rem;
-  }
-  .form-control:focus, .form-select:focus { border-color: var(--bhms-blue); box-shadow: 0 0 0 3px rgba(27,95,192,0.14); }
-  .badge { font-weight: 600; padding: 0.4em 0.75em; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.02em; }
+  .form-control { border-radius: 10px; border: 1px solid var(--bhms-gray-300); padding: 0.55rem 0.9rem; font-size: 0.9rem; }
+  .form-control:focus { border-color: var(--bhms-blue); box-shadow: 0 0 0 3px rgba(27,95,192,0.14); }
+  .modal-content { border: none; border-radius: var(--bhms-radius-lg); box-shadow: var(--bhms-shadow-lg); }
 
- 
   .bhms-content .container > .d-flex.justify-content-between.align-items-center.mb-4 {
     background: rgba(255,255,255,0.75);
     backdrop-filter: blur(12px);
@@ -150,33 +133,18 @@ if (!isset($cases)) { return; }
   }
   .bhms-content h3 { margin-bottom: 0; font-size: 1.25rem; display: flex; align-items: center; }
 
-
-
-  .cases-table-card {
-    background: #fff;
-    border-radius: var(--bhms-radius-lg);
-    box-shadow: var(--bhms-shadow-sm);
-    overflow: hidden;
-  }
+  .archive-table-card { background: #fff; border-radius: var(--bhms-radius-lg); box-shadow: var(--bhms-shadow-sm); overflow: hidden; }
   .table { margin-bottom: 0; border-collapse: separate; border-spacing: 0; }
   .table thead th {
     background: linear-gradient(135deg, var(--bhms-blue-light), #eaf2fb);
     color: var(--bhms-blue-dark);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 600;
-    border-bottom: none;
-    padding: 0.85rem 1rem;
-    white-space: nowrap;
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;
+    border-bottom: none; padding: 0.85rem 1rem; white-space: nowrap;
   }
   .table td { padding: 0.7rem 1rem; vertical-align: middle; font-size: 0.88rem; border-color: var(--bhms-gray-100); }
   .table-striped > tbody > tr:nth-of-type(odd) > * { background-color: var(--bhms-gray-50); }
   .table > tbody > tr:hover > * { background-color: var(--bhms-blue-light); }
-
-  .status-badge-active { background: var(--bhms-danger-light); color: #8a2c2c; }
-  .status-badge-monitoring { background: var(--bhms-warning-light); color: #8a5a12; }
-  .status-badge-recovered { background: var(--bhms-success-light); color: var(--bhms-success-darker); }
+  .type-badge { font-size: 0.7rem; padding: 0.3em 0.7em; border-radius: 999px; font-weight: 600; background: var(--bhms-blue-light); color: var(--bhms-blue-dark); }
 </style>
 </head>
 <body class="bhms-app-body">
@@ -196,7 +164,7 @@ if (!isset($cases)) { return; }
       <a href="../maternal/maternal.php" class="bhms-nav-link"><i class="fa-solid fa-person-pregnant"></i><span>Maternal Health</span></a>
       <a href="../infant/infant.php" class="bhms-nav-link"><i class="fa-solid fa-baby"></i><span>Infant Monitoring</span></a>
       <a href="../vaccination/vaccination.php" class="bhms-nav-link"><i class="fa-solid fa-syringe"></i><span>Vaccination Records</span></a>
-      <a href="../disease/disease.php" class="bhms-nav-link active"><i class="fa-solid fa-virus"></i><span>Disease Recording</span></a>
+      <a href="../disease/disease.php" class="bhms-nav-link"><i class="fa-solid fa-virus"></i><span>Disease Recording</span></a>
       <a href="../heatmap/heatmap.php" class="bhms-nav-link"><i class="fa-solid fa-map-location-dot"></i><span>Heatmap</span></a>
       <a href="../reports/reports.php" class="bhms-nav-link"><i class="fa-solid fa-file-lines"></i><span>Reports</span></a>
       <a href="../announcements/announcements.php" class="bhms-nav-link"><i class="fa-solid fa-bullhorn"></i><span>Announcements</span></a>
@@ -204,7 +172,7 @@ if (!isset($cases)) { return; }
       <div class="bhms-nav-divider">Admin</div>
       <a href="../admin/audit_log.php" class="bhms-nav-link"><i class="fa-solid fa-clipboard-list"></i><span>Audit Log</span></a>
       <a href="../admin/lgu_contacts.php" class="bhms-nav-link"><i class="fa-solid fa-address-book"></i><span>LGU Contacts</span></a>
-      <a href="../admin/archive.php" class="bhms-nav-link"><i class="fa-solid fa-box-archive"></i><span>Archive</span></a>
+      <a href="../admin/archive.php" class="bhms-nav-link active"><i class="fa-solid fa-box-archive"></i><span>Archive</span></a>
       <?php endif; ?>
     </nav>
     <div class="bhms-sidebar-footer">
@@ -215,7 +183,7 @@ if (!isset($cases)) { return; }
   <div class="bhms-main">
     <header class="bhms-topbar">
       <label for="bhmsSidebarToggle" class="bhms-menu-btn" aria-label="Toggle navigation"><i class="fa-solid fa-bars"></i></label>
-      <div class="bhms-topbar-title">Disease and Illness Case Recording</div>
+      <div class="bhms-topbar-title">Archive</div>
       <div class="bhms-topbar-user">
         <i class="fa-regular fa-circle-user"></i>
         <span><?= htmlspecialchars($_SESSION['full_name']) ?></span>
@@ -223,106 +191,103 @@ if (!isset($cases)) { return; }
       </div>
     </header>
     <main class="bhms-content">
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3><i class="fa-solid fa-virus me-2" style="color:var(--bhms-blue);"></i>Disease and Illness Case Recording</h3>
-    <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
-  </div>
+    <div class="container py-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="fa-solid fa-box-archive me-2" style="color:var(--bhms-blue);"></i>Archive</h3>
+        <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
+      </div>
 
-  <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-  <?php if ($success): ?><div class="alert alert-success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
+      <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
+      <?php if ($success): ?><div class="alert alert-success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
 
-  <div class="card mb-4">
-    <div class="card-body">
-      <h5 class="card-title"><i class="fa-solid <?= $edit_case ? 'fa-pen-to-square' : 'fa-notes-medical' ?> me-2"></i><?= $edit_case ? 'Update case' : 'Record new case' ?></h5>
-      <form method="POST" action="">
-        <input type="hidden" name="case_id" value="<?= htmlspecialchars($edit_case['case_id'] ?? '') ?>">
-        <div class="row g-3">
-          <div class="col-md-4">
-            <label class="form-label">Resident</label>
-            <select name="resident_id" class="form-select" required>
-              <option value="">Select resident</option>
-              <?php foreach ($residents as $r): ?>
-                <option value="<?= $r['resident_id'] ?>" <?= (string)($edit_case['resident_id'] ?? '') === (string)$r['resident_id'] ? 'selected' : '' ?>>
-                  <?= htmlspecialchars($r['last_name'] . ', ' . $r['first_name']) ?> (Purok <?= $r['purok'] ?>)
-                </option>
+      <div class="card">
+        <div class="card-body">
+          <p class="text-muted small mb-3">Archived records are hidden from their original module but not permanently deleted. Restore a record to bring it back, or permanently delete it if you're certain it's no longer needed.</p>
+          <?php if (empty($archived_items)): ?>
+            <p class="text-muted text-center py-4 mb-0">The archive is empty. Nothing has been archived yet.</p>
+          <?php else: ?>
+          <div class="archive-table-card">
+          <div class="table-responsive">
+          <table class="table table-striped">
+            <thead><tr><th>Type</th><th>Details</th><th>Archived by</th><th>Archived on</th><th>Actions</th></tr></thead>
+            <tbody>
+              <?php foreach ($archived_items as $item): ?>
+              <tr>
+                <td><span class="type-badge"><?= htmlspecialchars($item['label']) ?></span></td>
+                <td><?= $item['description'] ?></td>
+                <td><?= htmlspecialchars($item['archived_by']) ?></td>
+                <td><?= $item['archived_at'] ? htmlspecialchars(date('M j, Y g:i A', strtotime($item['archived_at']))) : 'Unknown' ?></td>
+                <td>
+                  <a href="?restore=<?= $item['type'] ?>:<?= $item['id'] ?>" class="btn btn-sm btn-outline-primary" onclick="return confirm('Restore this record? It will reappear in its original module.')">Restore</a>
+                  <button type="button" class="btn btn-sm btn-outline-danger"
+                    data-type="<?= $item['type'] ?>" data-id="<?= $item['id'] ?>" data-description="<?= $item['description'] ?>"
+                    onclick="openDeleteModal(this)">Delete Forever</button>
+                </td>
+              </tr>
               <?php endforeach; ?>
-            </select>
+            </tbody>
+          </table>
           </div>
-          <div class="col-md-4">
-            <label class="form-label">Disease name</label>
-            <input type="text" name="disease_name" class="form-control" required placeholder="e.g. Dengue, Diarrhea"
-              value="<?= htmlspecialchars($edit_case['disease_name'] ?? '') ?>">
           </div>
-          <div class="col-md-2">
-            <label class="form-label">Date reported</label>
-            <input type="date" name="date_reported" class="form-control" required
-              value="<?= htmlspecialchars($edit_case['date_reported'] ?? '') ?>">
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Status</label>
-            <select name="status" class="form-select">
-              <option value="Active" <?= ($edit_case['status'] ?? '') === 'Active' ? 'selected' : '' ?>>Active</option>
-              <option value="Under monitoring" <?= ($edit_case['status'] ?? '') === 'Under monitoring' ? 'selected' : '' ?>>Under monitoring</option>
-              <option value="Recovered" <?= ($edit_case['status'] ?? '') === 'Recovered' ? 'selected' : '' ?>>Recovered</option>
-            </select>
-          </div>
-          <div class="col-md-12">
-            <label class="form-label">Notes</label>
-            <textarea name="notes" class="form-control" rows="2"><?= htmlspecialchars($edit_case['notes'] ?? '') ?></textarea>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body p-4">
+              <h5 class="mb-3"><i class="fa-solid fa-triangle-exclamation me-2" style="color:var(--bhms-danger);"></i>Permanently Delete Record</h5>
+              <p class="text-muted small">This action cannot be undone. To confirm, type the record name exactly as shown below:</p>
+              <p class="fw-bold" id="deleteModalTarget"></p>
+              <input type="text" id="deleteConfirmInput" class="form-control mb-3" autocomplete="off" placeholder="Type here to confirm">
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="deleteConfirmBtn" disabled>Delete Forever</button>
+              </div>
+            </div>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3"><i class="fa-solid <?= $edit_case ? 'fa-floppy-disk' : 'fa-plus' ?> me-2"></i><?= $edit_case ? 'Update case' : 'Record case' ?></button>
-        <?php if ($edit_case): ?>
-          <a href="disease.php" class="btn btn-outline-secondary mt-3">Cancel edit</a>
-        <?php endif; ?>
-      </form>
+      </div>
     </div>
-  </div>
-
-  <h5><i class="fa-solid fa-list-check me-2"></i>All disease cases</h5>
-  <input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Search by resident or disease...">
-  <div class="cases-table-card">
-  <table class="table table-striped">
-    <thead>
-      <tr><th>Resident</th><th>Purok</th><th>Disease</th><th>Date reported</th><th>Status</th><th>Actions</th></tr>
-    </thead>
-    <tbody>
-      <?php foreach ($cases as $c): ?>
-      <tr>
-        <td><?= htmlspecialchars($c['last_name'] . ', ' . $c['first_name']) ?></td>
-        <td>Purok <?= htmlspecialchars($c['purok']) ?></td>
-        <td><?= htmlspecialchars($c['disease_name']) ?></td>
-        <td><?= htmlspecialchars($c['date_reported']) ?></td>
-        <td><?php $status_class = $c['status'] === 'Active' ? 'status-badge-active' : ($c['status'] === 'Under monitoring' ? 'status-badge-monitoring' : 'status-badge-recovered'); ?><span class="badge <?= $status_class ?>"><?= htmlspecialchars($c['status']) ?></span></td>
-        <td>
-          <a href="?edit=<?= $c['case_id'] ?>" class="btn btn-sm btn-outline-primary">Edit / update status</a>
-          <a href="?archive=<?= $c['case_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Archive this case? It will stop counting toward alerts, the heatmap, and reports.')">Archive</a>
-        </td>
-      </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
-  </div>
-</div>
-<script>
-document.getElementById('liveSearch').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    const rows = document.querySelectorAll('.cases-table-card tbody tr');
-    rows.forEach(function(row) {
-        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
-    });
-});
-</script>
     </main>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.querySelectorAll('.bhms-nav-link').forEach(function (link) {
   link.addEventListener('click', function () {
     var cb = document.getElementById('bhmsSidebarToggle');
     if (cb) { cb.checked = false; }
   });
+});
+
+let deleteModalInstance = null;
+let currentDeleteType = '';
+let currentDeleteId = '';
+let currentDeleteTarget = '';
+
+function openDeleteModal(btn) {
+    currentDeleteType = btn.dataset.type;
+    currentDeleteId = btn.dataset.id;
+    currentDeleteTarget = btn.dataset.description;
+
+    document.getElementById('deleteModalTarget').innerText = currentDeleteTarget;
+    document.getElementById('deleteConfirmInput').value = '';
+    document.getElementById('deleteConfirmBtn').disabled = true;
+
+    if (!deleteModalInstance) {
+        deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteModal'));
+    }
+    deleteModalInstance.show();
+}
+
+document.getElementById('deleteConfirmInput').addEventListener('input', function() {
+    document.getElementById('deleteConfirmBtn').disabled = (this.value !== currentDeleteTarget);
+});
+
+document.getElementById('deleteConfirmBtn').addEventListener('click', function() {
+    window.location.href = '?delete=' + currentDeleteType + ':' + currentDeleteId;
 });
 </script>
 </body>

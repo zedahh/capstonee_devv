@@ -212,6 +212,7 @@ if (!isset($residents)) { return; }
       <div class="bhms-nav-divider">Admin</div>
       <a href="../admin/audit_log.php" class="bhms-nav-link"><i class="fa-solid fa-clipboard-list"></i><span>Audit Log</span></a>
       <a href="../admin/lgu_contacts.php" class="bhms-nav-link"><i class="fa-solid fa-address-book"></i><span>LGU Contacts</span></a>
+      <a href="../admin/archive.php" class="bhms-nav-link"><i class="fa-solid fa-box-archive"></i><span>Archive</span></a>
       <?php endif; ?>
     </nav>
     <div class="bhms-sidebar-footer">
@@ -321,7 +322,7 @@ if (!isset($residents)) { return; }
           <button type="button" class="btn btn-sm btn-outline-success"
           onclick="showQr('<?= htmlspecialchars($r['qr_code']) ?>', '<?= htmlspecialchars($r['first_name'] . ' ' . $r['last_name']) ?>')">View QR</button>
           <a href="?edit=<?= $r['resident_id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-          <a href="?delete=<?= $r['resident_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Deactivate this resident?')">Delete</a>
+          <a href="?archive=<?= $r['resident_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Archive this resident? They will be hidden from the list but not permanently deleted.')">Archive</a>
         </td>
       </tr>
       <?php endforeach; ?>

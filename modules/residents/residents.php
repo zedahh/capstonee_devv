@@ -20,15 +20,16 @@ if (isset($_SESSION['flash_error'])) {
     unset($_SESSION['flash_error']);
 }
 
-// Handle delete (deactivate, not permanently erase)
-if (isset($_GET['delete'])) {
-    $id = (int) $_GET['delete'];
+// Handle archive (deactivate, not permanently erase)
+if (isset($_GET['archive'])) {
+    $id = (int) $_GET['archive'];
     $stmt = $pdo->prepare("UPDATE residents SET is_active = 0 WHERE resident_id = ?");
     $stmt->execute([$id]);
 
-    $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, table_name, record_id, details) VALUES (?, 'DELETE', 'residents', ?, 'Deactivated resident')");
+    $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, table_name, record_id, details) VALUES (?, 'ARCHIVE', 'residents', ?, 'Archived resident')");
     $log->execute([$_SESSION['user_id'], $id]);
 
+    $_SESSION['flash_success'] = 'Resident archived successfully.';
     header('Location: residents.php');
     exit;
 }

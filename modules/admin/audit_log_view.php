@@ -172,6 +172,7 @@
       <div class="bhms-nav-divider">Admin</div>
       <a href="../admin/audit_log.php" class="bhms-nav-link active"><i class="fa-solid fa-clipboard-list"></i><span>Audit Log</span></a>
       <a href="../admin/lgu_contacts.php" class="bhms-nav-link"><i class="fa-solid fa-address-book"></i><span>LGU Contacts</span></a>
+      <a href="../admin/archive.php" class="bhms-nav-link"><i class="fa-solid fa-box-archive"></i><span>Archive</span></a>
       <?php endif; ?>
     </nav>
     <div class="bhms-sidebar-footer">
@@ -196,6 +197,8 @@
     <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
   </div>
 
+  <input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Search by user, action, table, or details...">
+
   <div class="audit-table-card">
   <table class="table table-striped table-sm">
     <thead>
@@ -218,6 +221,15 @@
   </table>
   </div>
 </div>
+<script>
+document.getElementById('liveSearch').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.audit-table-card tbody tr');
+    rows.forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+    });
+});
+</script>
     </main>
   </div>
 </div>

@@ -75,7 +75,6 @@ function getRiskLevel($count, $population) {
 $ranking = $purok_counts;
 arsort($ranking);
 
-// Fetch individual cases with resident info, for the clickable dots (same filters applied)
 $caseStmt = $pdo->prepare("
     SELECT dc.disease_name, dc.date_reported, dc.status, r.resident_id, r.first_name, r.last_name, r.purok, r.approx_lat, r.approx_lng
     FROM disease_cases dc
@@ -85,8 +84,7 @@ $caseStmt = $pdo->prepare("
 $caseStmt->execute($params);
 $cases = $caseStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Generate and save an approximate location for any resident who doesn't have one yet,
-// then group all case records by resident so each person gets exactly one marker
+
 $residents_map = [];
 foreach ($cases as $c) {
     if ($c['approx_lat'] === null || $c['approx_lng'] === null) {

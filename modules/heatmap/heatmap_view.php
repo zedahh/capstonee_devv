@@ -347,7 +347,7 @@ casePoints.forEach(function(c) {
     }).join('<br>');
 
     L.circleMarker([c.lat, c.lng], {
-        radius: 2,
+        radius: 3,
         color: '#222',
         weight: 1,
         fillColor: '#333',

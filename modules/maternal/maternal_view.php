@@ -182,6 +182,82 @@ if (!isset($records)) { return; }
   .status-badge-highrisk { background: var(--bhms-danger-light); color: #8a2c2c; }
   .status-badge-delivered { background: var(--bhms-success-light); color: var(--bhms-success-darker); }
   .status-badge-postpartum { background: var(--bhms-gray-100); color: var(--bhms-gray-600); }
+  .status-badge-referred { background: #FDF2E4; color: #8a5a12; }
+  .status-badge-deceased { background: var(--bhms-gray-200); color: var(--bhms-gray-600); }
+
+  /* Floating toast notifications (centered) */
+  .bhms-toast-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,24,28,0.45);
+    z-index: 1999;
+    animation: bhmsBackdropIn 0.2s ease;
+  }
+  .bhms-toast-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: calc(100% - 48px);
+    max-width: 420px;
+  }
+  .bhms-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: #fff;
+    border-radius: var(--bhms-radius-lg);
+    box-shadow: var(--bhms-shadow-md);
+    padding: 1.25rem 1.4rem;
+    border-left: 4px solid transparent;
+    animation: bhmsToastIn 0.25s ease;
+  }
+  .bhms-toast-danger { border-left-color: var(--bhms-danger); }
+  .bhms-toast-success { border-left-color: var(--bhms-success); }
+  .bhms-toast-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .bhms-toast-danger .bhms-toast-icon { color: var(--bhms-danger); }
+  .bhms-toast-success .bhms-toast-icon { color: var(--bhms-success); }
+  .bhms-toast-body { flex: 1 1 auto; min-width: 0; }
+  .bhms-toast-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
+  .bhms-toast-danger .bhms-toast-title { color: #8a2c2c; }
+  .bhms-toast-success .bhms-toast-title { color: var(--bhms-success-darker); }
+  .bhms-toast-message { font-size: 0.88rem; color: var(--bhms-gray-600); line-height: 1.45; word-break: break-word; }
+  .bhms-toast-ok {
+    display: block;
+    margin-left: auto;
+    margin-top: 0.9rem;
+    border: none;
+    background: linear-gradient(135deg, var(--bhms-blue), var(--bhms-blue-dark));
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 0.4rem 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+  }
+  .bhms-toast-ok:hover { filter: brightness(0.95); }
+  .bhms-toast-content { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
+  .bhms-toast-row { display: flex; align-items: flex-start; gap: 0.75rem; }
+  .bhms-toast.bhms-toast-hide { animation: bhmsToastOut 0.18s ease forwards; }
+  .bhms-toast-backdrop.bhms-toast-hide { animation: bhmsBackdropOut 0.18s ease forwards; }
+  @keyframes bhmsToastIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes bhmsToastOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.92); }
+  }
+  @keyframes bhmsBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes bhmsBackdropOut { from { opacity: 1; } to { opacity: 0; } }
+  @media (max-width: 576px) {
+    .bhms-toast-container { width: calc(100% - 32px); }
+  }
 </style>
 </head>
 <body class="bhms-app-body">
@@ -268,9 +344,6 @@ if (!isset($records)) { return; }
     <h3><i class="fa-solid fa-person-pregnant me-2" style="color:var(--bhms-blue);"></i>Maternal Health Monitoring</h3>
     <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
   </div>
-
-  <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-  <?php if ($success): ?><div class="alert alert-success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
 
   <div class="card mb-4">
     <div class="card-body">

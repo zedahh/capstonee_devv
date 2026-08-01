@@ -178,53 +178,8 @@ if (!isset($cases)) { return; }
 
   .status-badge-active { background: var(--bhms-danger-light); color: #8a2c2c; }
   .status-badge-monitoring { background: var(--bhms-warning-light); color: #8a5a12; }
-<<<<<<< HEAD
   .status-badge-recovered { background: var(--bhms-success-light); color: var(--bhms-success-darker); }
-
-  /* Floating success popup — centered modal-style, covers record/edit/archive, auto-dismisses */
-  .popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(20,24,28,0.35);
-    z-index: 1070;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: overlayIn 0.25s ease;
-    transition: opacity 0.3s ease;
-  }
-  .popup-toast {
-    position: relative;
-    z-index: 1080;
-    min-width: 300px;
-    max-width: 420px;
-    background: #fff;
-    border-left: 4px solid var(--bhms-success);
-    border-radius: var(--bhms-radius-lg);
-    box-shadow: var(--bhms-shadow-md);
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    font-size: 0.95rem;
-    color: var(--bhms-gray-800);
-    animation: popupIn 0.3s ease;
-  }
-  .popup-toast i { color: var(--bhms-success); font-size: 1.3rem; margin-top: 0.1rem; }
-  .popup-toast .popup-close {
-    margin-left: auto; background: none; border: none; color: var(--bhms-gray-400);
-    cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0;
-  }
-  .popup-toast .popup-close:hover { color: var(--bhms-gray-600); }
-  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes popupIn {
-    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-  }
-  @media (prefers-reduced-motion: reduce) { .popup-overlay, .popup-toast { animation: none; } }
-=======
-.status-badge-recovered { background: var(--bhms-success-light); color: var(--bhms-success-darker); }
-.status-badge-referred { background: var(--bhms-blue-light); color: var(--bhms-blue-dark); }
+  .status-badge-referred { background: var(--bhms-blue-light); color: var(--bhms-blue-dark); }
   .status-badge-deceased { background: var(--bhms-gray-200); color: var(--bhms-gray-600); }
 
   input#case_purok_display { background: var(--bhms-gray-50); color: var(--bhms-gray-600); font-weight: 500; cursor: not-allowed; }
@@ -302,7 +257,6 @@ if (!isset($cases)) { return; }
   @media (max-width: 576px) {
     .bhms-toast-container { width: calc(100% - 32px); }
   }
->>>>>>> 2a5d5af6432e2fec26b48f93e827131c5831b515
 </style>
 </head>
 <body class="bhms-app-body">
@@ -390,33 +344,6 @@ if (!isset($cases)) { return; }
     <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
   </div>
 
-<<<<<<< HEAD
-  <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-
-  <?php if ($success): ?>
-  <div class="popup-overlay" id="successOverlay">
-    <div class="popup-toast" id="successPopup">
-      <i class="fa-solid fa-circle-check"></i>
-      <div><?= htmlspecialchars($success) ?></div>
-      <button type="button" class="popup-close" onclick="document.getElementById('successOverlay').remove()" aria-label="Close">&times;</button>
-    </div>
-  </div>
-  <script>
-    document.getElementById('successOverlay').addEventListener('click', function (e) {
-      if (e.target === this) { this.remove(); }
-    });
-    setTimeout(function () {
-      var overlay = document.getElementById('successOverlay');
-      if (overlay) {
-        overlay.style.opacity = '0';
-        setTimeout(function () { overlay.remove(); }, 300);
-      }
-    }, 3500);
-  </script>
-  <?php endif; ?>
-
-=======
->>>>>>> 2a5d5af6432e2fec26b48f93e827131c5831b515
   <div class="card mb-4">
     <div class="card-body">
       <h5 class="card-title"><i class="fa-solid <?= $edit_case ? 'fa-pen-to-square' : 'fa-notes-medical' ?> me-2"></i><?= $edit_case ? 'Update case' : 'Record new case' ?></h5>

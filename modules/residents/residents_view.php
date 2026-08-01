@@ -186,49 +186,6 @@ if (!isset($residents)) { return; }
 
   #liveSearch { border-radius: 10px !important; }
 
-<<<<<<< HEAD
-  /* Floating success popup — centered modal-style, covers add/update/archive, auto-dismisses */
-  .popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(20,24,28,0.35);
-    z-index: 1070;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: overlayIn 0.25s ease;
-    transition: opacity 0.3s ease;
-  }
-  .popup-toast {
-    position: relative;
-    z-index: 1080;
-    min-width: 300px;
-    max-width: 420px;
-    background: #fff;
-    border-left: 4px solid var(--bhms-success);
-    border-radius: var(--bhms-radius-lg);
-    box-shadow: var(--bhms-shadow-lg);
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    font-size: 0.95rem;
-    color: var(--bhms-gray-800);
-    animation: popupIn 0.3s ease;
-  }
-  .popup-toast i { color: var(--bhms-success); font-size: 1.3rem; margin-top: 0.1rem; }
-  .popup-toast .popup-close {
-    margin-left: auto; background: none; border: none; color: var(--bhms-gray-400);
-    cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0;
-  }
-  .popup-toast .popup-close:hover { color: var(--bhms-gray-600); }
-  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes popupIn {
-    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-  }
-  @media (prefers-reduced-motion: reduce) { .popup-overlay, .popup-toast { animation: none; } }
-=======
   /* Floating toast notifications (centered) */
   .bhms-toast-backdrop {
     position: fixed;
@@ -261,21 +218,21 @@ if (!isset($residents)) { return; }
     animation: bhmsToastIn 0.25s ease;
   }
   .bhms-toast-danger { border-left-color: var(--bhms-danger); }
-  .bhms-toast-success { border-left-color: var(--bhms-green); }
+  .bhms-toast-success { border-left-color: var(--bhms-success); }
   .bhms-toast-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.1rem; }
   .bhms-toast-danger .bhms-toast-icon { color: var(--bhms-danger); }
-  .bhms-toast-success .bhms-toast-icon { color: var(--bhms-green); }
+  .bhms-toast-success .bhms-toast-icon { color: var(--bhms-success); }
   .bhms-toast-body { flex: 1 1 auto; min-width: 0; }
   .bhms-toast-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
   .bhms-toast-danger .bhms-toast-title { color: #8a2c2c; }
-  .bhms-toast-success .bhms-toast-title { color: var(--bhms-green-darker); }
+  .bhms-toast-success .bhms-toast-title { color: var(--bhms-success-darker); }
   .bhms-toast-message { font-size: 0.88rem; color: var(--bhms-gray-600); line-height: 1.45; word-break: break-word; }
   .bhms-toast-ok {
     display: block;
     margin-left: auto;
     margin-top: 0.9rem;
     border: none;
-    background: linear-gradient(135deg, var(--bhms-green), var(--bhms-blue));
+    background: linear-gradient(135deg, var(--bhms-blue), var(--bhms-blue-dark));
     color: #fff;
     font-weight: 600;
     font-size: 0.8rem;
@@ -302,7 +259,6 @@ if (!isset($residents)) { return; }
   @media (max-width: 576px) {
     .bhms-toast-container { width: calc(100% - 32px); }
   }
->>>>>>> 2a5d5af6432e2fec26b48f93e827131c5831b515
 </style>
 </head>
 <body class="bhms-app-body">
@@ -390,33 +346,6 @@ if (!isset($residents)) { return; }
     <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
   </div>
 
-<<<<<<< HEAD
-  <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-
-  <?php if ($success): ?>
-  <div class="popup-overlay" id="successOverlay">
-    <div class="popup-toast" id="successPopup">
-      <i class="fa-solid fa-circle-check"></i>
-      <div><?= htmlspecialchars($success) ?></div>
-      <button type="button" class="popup-close" onclick="document.getElementById('successOverlay').remove()" aria-label="Close">&times;</button>
-    </div>
-  </div>
-  <script>
-    document.getElementById('successOverlay').addEventListener('click', function (e) {
-      if (e.target === this) { this.remove(); }
-    });
-    setTimeout(function () {
-      var overlay = document.getElementById('successOverlay');
-      if (overlay) {
-        overlay.style.opacity = '0';
-        setTimeout(function () { overlay.remove(); }, 300);
-      }
-    }, 3500);
-  </script>
-  <?php endif; ?>
-
-=======
->>>>>>> 2a5d5af6432e2fec26b48f93e827131c5831b515
   <div class="card mb-4">
     <div class="card-body">
       <h5 class="card-title"><i class="fa-solid <?= $edit_resident ? 'fa-pen-to-square' : 'fa-user-plus' ?> me-2"></i><?= $edit_resident ? 'Edit resident' : 'Add new resident' ?></h5>
@@ -440,13 +369,8 @@ if (!isset($residents)) { return; }
             <input type="text" name="suffix" class="form-control" value="<?= htmlspecialchars($edit_resident['suffix'] ?? '') ?>">
           </div>
           <div class="col-md-3">
-<<<<<<< HEAD
-            <label class="form-label">Birth date</label>
-            <input type="date" name="birth_date" class="form-control" required max="<?= date('Y-m-d') ?>" value="<?= htmlspecialchars($edit_resident['birth_date'] ?? '') ?>">
-=======
             <label class="form-label">Birth date <span class="text-danger">*</span></label>
-            <input type="date" name="birth_date" class="form-control" required value="<?= htmlspecialchars($edit_resident['birth_date'] ?? '') ?>">
->>>>>>> 2a5d5af6432e2fec26b48f93e827131c5831b515
+            <input type="date" name="birth_date" class="form-control" required max="<?= date('Y-m-d') ?>" value="<?= htmlspecialchars($edit_resident['birth_date'] ?? '') ?>">
           </div>
           <div class="col-md-3">
             <label class="form-label">Gender <span class="text-danger">*</span></label>

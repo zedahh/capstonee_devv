@@ -49,7 +49,7 @@ $infants = $pdo->query("
     SELECT infant_records.infant_record_id, r.first_name, r.last_name, r.purok
     FROM infant_records
     JOIN residents r ON infant_records.resident_id = r.resident_id
-    WHERE infant_records.is_active = 1
+    WHERE infant_records.is_active = 1 AND infant_records.monitoring_status != 'Deceased'
     ORDER BY r.last_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 

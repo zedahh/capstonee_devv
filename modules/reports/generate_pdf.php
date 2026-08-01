@@ -8,14 +8,14 @@ require '../../config/database.php';
 require '../../includes/functions.php';
 require '../../vendor/autoload.php';
 
-$total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active = 1")->fetchColumn();
-$total_maternal = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk')")->fetchColumn();
-$total_infants = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)")->fetchColumn();
+$total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active = 1 AND vital_status = 'Alive'")->fetchColumn();
+$total_maternal = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk') AND is_active = 1")->fetchColumn();
+$total_infants = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) AND ir.is_active = 1 AND ir.monitoring_status != 'Deceased'")->fetchColumn();
 $total_vaccinations = $pdo->query("SELECT COUNT(*) FROM vaccination_records")->fetchColumn();
 $total_disease_cases = $pdo->query("SELECT COUNT(*) FROM disease_cases WHERE status IN ('Active', 'Under monitoring') AND is_active = 1")->fetchColumn();
 
 $disease_breakdown = $pdo->query("SELECT disease_name, COUNT(*) as total FROM disease_cases WHERE is_active = 1 GROUP BY disease_name ORDER BY total DESC")->fetchAll(PDO::FETCH_ASSOC);
-$purok_breakdown = $pdo->query("SELECT r.purok, COUNT(*) as total FROM residents r WHERE r.is_active = 1 GROUP BY r.purok ORDER BY r.purok")->fetchAll(PDO::FETCH_ASSOC);
+$purok_breakdown = $pdo->query("SELECT r.purok, COUNT(*) as total FROM residents r WHERE r.is_active = 1 AND r.vital_status = 'Alive' GROUP BY r.purok ORDER BY r.purok")->fetchAll(PDO::FETCH_ASSOC);
 
 $insights = [];
 
@@ -43,6 +43,7 @@ $infants_all = $pdo->query("
     SELECT infant_records.infant_record_id, r.birth_date
     FROM infant_records
     JOIN residents r ON infant_records.resident_id = r.resident_id
+    WHERE infant_records.is_active = 1 AND infant_records.monitoring_status != 'Deceased'
 ")->fetchAll(PDO::FETCH_ASSOC);
 $fic_complete = 0;
 $fic_overdue = 0;
@@ -58,7 +59,7 @@ if ($fic_total > 0) {
 }
 
 $prenatal_schedule = $pdo->query("SELECT * FROM prenatal_visit_schedule")->fetchAll(PDO::FETCH_ASSOC);
-$maternal_all = $pdo->query("SELECT maternal_record_id, lmp_date, monitoring_status FROM maternal_records")->fetchAll(PDO::FETCH_ASSOC);
+$maternal_all = $pdo->query("SELECT maternal_record_id, lmp_date, monitoring_status FROM maternal_records WHERE is_active = 1")->fetchAll(PDO::FETCH_ASSOC);
 $prenatal_behind = 0;
 $prenatal_total = count($maternal_all);
 foreach ($maternal_all as $mat) {

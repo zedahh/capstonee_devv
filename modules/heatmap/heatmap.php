@@ -54,7 +54,7 @@ foreach ($counts_raw as $row) {
 $purok_population_raw = $pdo->query("
     SELECT purok, COUNT(*) as total
     FROM residents
-    WHERE is_active = 1
+    WHERE is_active = 1 AND vital_status = 'Alive'
     GROUP BY purok
 ")->fetchAll(PDO::FETCH_ASSOC);
 $purok_population = [1 => 0, 2 => 0, 3 => 0, 4 => 0];

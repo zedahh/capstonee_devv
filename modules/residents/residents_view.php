@@ -419,7 +419,7 @@ if (!isset($residents)) { return; }
     <tbody>
       <?php foreach ($residents as $r): ?>
       <tr>
-        <td><div class="resident-name-cell"><div class="resident-icon"><i class="fa-solid fa-user"></i></div><?= htmlspecialchars($r['last_name'] . ', ' . $r['first_name'] . ' ' . $r['middle_name']) ?></div></td>
+        <td><div class="resident-name-cell"><div class="resident-icon"><i class="fa-solid fa-user"></i></div><?= htmlspecialchars($r['last_name'] . ', ' . $r['first_name'] . ' ' . $r['middle_name']) ?><?php if ($r['vital_status'] === 'Deceased'): ?> <span class="badge" style="background:var(--bhms-gray-200);color:var(--bhms-gray-600);">Deceased</span><?php endif; ?></div></td>
         <td><?= htmlspecialchars($r['birth_date']) ?></td>
         <td><?= htmlspecialchars($r['gender']) ?></td>
         <td>Purok <?= htmlspecialchars($r['purok']) ?></td>
@@ -429,6 +429,11 @@ if (!isset($residents)) { return; }
           onclick="showQr('<?= htmlspecialchars($r['qr_code']) ?>', '<?= htmlspecialchars($r['first_name'] . ' ' . $r['last_name']) ?>')">View QR</button>
           <a href="?edit=<?= $r['resident_id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
           <a href="?archive=<?= $r['resident_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Archive this resident? They will be hidden from the list but not permanently deleted.')">Archive</a>
+          <?php if ($r['vital_status'] === 'Deceased'): ?>
+          <a href="?mark_alive=<?= $r['resident_id'] ?>" class="btn btn-sm btn-outline-secondary" onclick="return confirm('Undo deceased status for this resident?')">Undo</a>
+          <?php else: ?>
+          <a href="?mark_deceased=<?= $r['resident_id'] ?>" class="btn btn-sm btn-outline-secondary" onclick="return confirm('Mark this resident as deceased? Their record stays visible, but they will no longer appear when selecting someone for new maternal, infant, or disease records.')">Mark Deceased</a>
+          <?php endif; ?>
         </td>
       </tr>
       <?php endforeach; ?>

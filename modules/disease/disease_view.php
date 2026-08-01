@@ -179,6 +179,8 @@ if (!isset($cases)) { return; }
   .status-badge-active { background: var(--bhms-danger-light); color: #8a2c2c; }
   .status-badge-monitoring { background: var(--bhms-warning-light); color: #8a5a12; }
 .status-badge-recovered { background: var(--bhms-success-light); color: var(--bhms-success-darker); }
+.status-badge-referred { background: var(--bhms-blue-light); color: var(--bhms-blue-dark); }
+  .status-badge-deceased { background: var(--bhms-gray-200); color: var(--bhms-gray-600); }
 
   input#case_purok_display { background: var(--bhms-gray-50); color: var(--bhms-gray-600); font-weight: 500; cursor: not-allowed; }
 
@@ -387,6 +389,8 @@ if (!isset($cases)) { return; }
               <option value="Active" <?= ($edit_case['status'] ?? '') === 'Active' ? 'selected' : '' ?>>Active</option>
               <option value="Under monitoring" <?= ($edit_case['status'] ?? '') === 'Under monitoring' ? 'selected' : '' ?>>Under monitoring</option>
               <option value="Recovered" <?= ($edit_case['status'] ?? '') === 'Recovered' ? 'selected' : '' ?>>Recovered</option>
+              <option value="Referred to RHU" <?= ($edit_case['status'] ?? '') === 'Referred to RHU' ? 'selected' : '' ?>>Referred to RHU</option>
+              <option value="Deceased" <?= ($edit_case['status'] ?? '') === 'Deceased' ? 'selected' : '' ?>>Deceased</option>
             </select>
           </div>
           <div class="col-md-12">
@@ -416,7 +420,15 @@ if (!isset($cases)) { return; }
         <td>Purok <?= htmlspecialchars($c['purok']) ?></td>
         <td><?= htmlspecialchars($c['disease_name']) ?></td>
         <td><?= htmlspecialchars($c['date_reported']) ?></td>
-        <td><?php $status_class = $c['status'] === 'Active' ? 'status-badge-active' : ($c['status'] === 'Under monitoring' ? 'status-badge-monitoring' : 'status-badge-recovered'); ?><span class="badge <?= $status_class ?>"><?= htmlspecialchars($c['status']) ?></span></td>
+        <td><?php
+          $status_class = match($c['status']) {
+              'Active' => 'status-badge-active',
+              'Under monitoring' => 'status-badge-monitoring',
+              'Referred to RHU' => 'status-badge-referred',
+              'Deceased' => 'status-badge-deceased',
+              default => 'status-badge-recovered',
+          };
+        ?><span class="badge <?= $status_class ?>"><?= htmlspecialchars($c['status']) ?></span></td>
         <td>
           <a href="?edit=<?= $c['case_id'] ?>" class="btn btn-sm btn-outline-primary">Edit / update status</a>
           <a href="?archive=<?= $c['case_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Archive this case? It will stop counting toward alerts, the heatmap, and reports.')">Archive</a>

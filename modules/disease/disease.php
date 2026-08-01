@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Dropdown: all residents
-$residents = $pdo->query("SELECT resident_id, first_name, last_name, purok FROM residents WHERE is_active = 1 ORDER BY last_name")->fetchAll(PDO::FETCH_ASSOC);
+$residents = $pdo->query("SELECT resident_id, first_name, last_name, purok FROM residents WHERE is_active = 1 AND vital_status = 'Alive' ORDER BY last_name")->fetchAll(PDO::FETCH_ASSOC);
 
 // List all cases, joined with resident info
 $cases = $pdo->query("

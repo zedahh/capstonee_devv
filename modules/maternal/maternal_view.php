@@ -181,7 +181,8 @@ if (!isset($records)) { return; }
   .status-badge-ongoing { background: var(--bhms-blue-light); color: var(--bhms-blue-dark); }
   .status-badge-highrisk { background: var(--bhms-danger-light); color: #8a2c2c; }
   .status-badge-delivered { background: var(--bhms-success-light); color: var(--bhms-success-darker); }
-  .status-badge-postpartum { background: var(--bhms-gray-100); color: var(--bhms-gray-600); }
+  .status-badge-referred { background: var(--bhms-blue-light); color: var(--bhms-blue-dark); }
+  .status-badge-deceased { background: var(--bhms-gray-200); color: var(--bhms-gray-600); }
 
   #resident_purok_display { background: var(--bhms-gray-50); color: var(--bhms-gray-600); font-weight: 500; cursor: not-allowed; }
 
@@ -386,6 +387,8 @@ if (!isset($records)) { return; }
               <option value="High-risk">High-risk</option>
               <option value="Delivered">Delivered</option>
               <option value="Postpartum">Postpartum</option>
+              <option value="Referred to RHU">Referred to RHU</option>
+              <option value="Deceased">Deceased</option>
             </select>
           </div>
           <div class="col-md-12">
@@ -414,7 +417,7 @@ if (!isset($records)) { return; }
         <td>Purok <?= htmlspecialchars($rec['purok']) ?></td>
         <td><?= htmlspecialchars($rec['lmp_date']) ?></td>
         <td><?= htmlspecialchars($rec['edd_date']) ?></td>
-        <td><?php $mstat_class = ['Ongoing' => 'status-badge-ongoing', 'High-risk' => 'status-badge-highrisk', 'Delivered' => 'status-badge-delivered', 'Postpartum' => 'status-badge-postpartum'][$rec['monitoring_status']] ?? 'status-badge-ongoing'; ?><span class="badge <?= $mstat_class ?>"><?= htmlspecialchars($rec['monitoring_status']) ?></span></td>
+        <td><?php $mstat_class = ['Ongoing' => 'status-badge-ongoing', 'High-risk' => 'status-badge-highrisk', 'Delivered' => 'status-badge-delivered', 'Postpartum' => 'status-badge-postpartum', 'Referred to RHU' => 'status-badge-referred', 'Deceased' => 'status-badge-deceased'][$rec['monitoring_status']] ?? 'status-badge-ongoing'; ?><span class="badge <?= $mstat_class ?>"><?= htmlspecialchars($rec['monitoring_status']) ?></span></td>
         <td><span class="badge bg-<?= $compliance['badge'] ?>"><?= htmlspecialchars($compliance['label']) ?></span></td>
         <td>
           <a href="checkups.php?id=<?= $rec['maternal_record_id'] ?>" class="btn btn-sm btn-outline-primary">View checkups</a>

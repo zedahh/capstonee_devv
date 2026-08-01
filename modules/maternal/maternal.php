@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$female_residents = $pdo->query("SELECT resident_id, first_name, last_name, purok FROM residents WHERE gender = 'Female' AND is_active = 1 ORDER BY last_name")->fetchAll(PDO::FETCH_ASSOC);
+$female_residents = $pdo->query("SELECT resident_id, first_name, last_name, purok FROM residents WHERE gender = 'Female' AND is_active = 1 AND vital_status = 'Alive' ORDER BY last_name")->fetchAll(PDO::FETCH_ASSOC);
 
 $records = $pdo->query("
     SELECT maternal_records.*, residents.first_name, residents.last_name, residents.purok

@@ -20,6 +20,26 @@ if (isset($_SESSION['flash_error'])) {
     unset($_SESSION['flash_error']);
 }
 
+// Toggle vital status — reversible, unlike archive
+if (isset($_GET['mark_deceased'])) {
+    $id = (int) $_GET['mark_deceased'];
+    $pdo->prepare("UPDATE residents SET vital_status = 'Deceased' WHERE resident_id = ?")->execute([$id]);
+    $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, table_name, record_id, details) VALUES (?, 'UPDATE', 'residents', ?, 'Marked resident as deceased')");
+    $log->execute([$_SESSION['user_id'], $id]);
+    $_SESSION['flash_success'] = 'Resident marked as deceased.';
+    header('Location: residents.php');
+    exit;
+}
+if (isset($_GET['mark_alive'])) {
+    $id = (int) $_GET['mark_alive'];
+    $pdo->prepare("UPDATE residents SET vital_status = 'Alive' WHERE resident_id = ?")->execute([$id]);
+    $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, table_name, record_id, details) VALUES (?, 'UPDATE', 'residents', ?, 'Reverted vital status to alive')");
+    $log->execute([$_SESSION['user_id'], $id]);
+    $_SESSION['flash_success'] = 'Vital status corrected.';
+    header('Location: residents.php');
+    exit;
+}
+
 // Handle archive (deactivate, not permanently erase)
 if (isset($_GET['archive'])) {
     $id = (int) $_GET['archive'];

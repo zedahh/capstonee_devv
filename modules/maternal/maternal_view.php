@@ -126,8 +126,10 @@ if (!isset($records)) { return; }
   .btn-primary:hover, .btn-primary:focus { filter: brightness(0.95); transform: translateY(-1px); box-shadow: var(--bhms-shadow-md); color: #fff; }
   .btn-outline-secondary { color: var(--bhms-gray-600); border-color: var(--bhms-gray-300); }
   .btn-outline-secondary:hover { background: var(--bhms-gray-600); border-color: var(--bhms-gray-600); }
-  .btn-outline-primary { color: var(--bhms-blue-dark); border-color: var(--bhms-blue); }
+.btn-outline-primary { color: var(--bhms-blue-dark); border-color: var(--bhms-blue); }
   .btn-outline-primary:hover { background: var(--bhms-blue); border-color: var(--bhms-blue); }
+  .btn-outline-danger { color: var(--bhms-danger); border-color: var(--bhms-danger); }
+  .btn-outline-danger:hover { background: var(--bhms-danger); border-color: var(--bhms-danger); }
   .alert { border: none; border-left: 4px solid transparent; border-radius: var(--bhms-radius-sm); font-size: 0.9rem; padding: 0.9rem 1.1rem; }
   .alert-danger { background: var(--bhms-danger-light); color: #8a2c2c; border-left-color: var(--bhms-danger); }
   .alert-success { background: var(--bhms-success-light); color: var(--bhms-success-darker); border-left-color: var(--bhms-success); }
@@ -180,48 +182,6 @@ if (!isset($records)) { return; }
   .status-badge-highrisk { background: var(--bhms-danger-light); color: #8a2c2c; }
   .status-badge-delivered { background: var(--bhms-success-light); color: var(--bhms-success-darker); }
   .status-badge-postpartum { background: var(--bhms-gray-100); color: var(--bhms-gray-600); }
-
-  /* Floating success popup — centered modal-style, covers add/update/delete, auto-dismisses */
-  .popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(20,24,28,0.35);
-    z-index: 1070;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: overlayIn 0.25s ease;
-    transition: opacity 0.3s ease;
-  }
-  .popup-toast {
-    position: relative;
-    z-index: 1080;
-    min-width: 300px;
-    max-width: 420px;
-    background: #fff;
-    border-left: 4px solid var(--bhms-success);
-    border-radius: var(--bhms-radius-lg);
-    box-shadow: var(--bhms-shadow-md);
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    font-size: 0.95rem;
-    color: var(--bhms-gray-800);
-    animation: popupIn 0.3s ease;
-  }
-  .popup-toast i { color: var(--bhms-success); font-size: 1.3rem; margin-top: 0.1rem; }
-  .popup-toast .popup-close {
-    margin-left: auto; background: none; border: none; color: var(--bhms-gray-400);
-    cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0;
-  }
-  .popup-toast .popup-close:hover { color: var(--bhms-gray-600); }
-  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes popupIn {
-    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-  }
-  @media (prefers-reduced-motion: reduce) { .popup-overlay, .popup-toast { animation: none; } }
 </style>
 </head>
 <body class="bhms-app-body">
@@ -268,6 +228,41 @@ if (!isset($records)) { return; }
       </div>
     </header>
     <main class="bhms-content">
+
+<?php if ($error || $success): ?>
+<div class="bhms-toast-backdrop" id="bhmsToastBackdrop"></div>
+<div class="bhms-toast-container" id="bhmsToastContainer">
+  <?php if ($error): ?>
+  <div class="bhms-toast bhms-toast-danger" id="bhmsToastError">
+    <div class="bhms-toast-content">
+      <div class="bhms-toast-row">
+        <div class="bhms-toast-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+        <div class="bhms-toast-body">
+          <div class="bhms-toast-title">Something went wrong</div>
+          <div class="bhms-toast-message"><?= htmlspecialchars($error) ?></div>
+        </div>
+      </div>
+      <button type="button" class="bhms-toast-ok" onclick="bhmsDismissToast('bhmsToastError')">OK</button>
+    </div>
+  </div>
+  <?php endif; ?>
+  <?php if ($success): ?>
+  <div class="bhms-toast bhms-toast-success" id="bhmsToastSuccess">
+    <div class="bhms-toast-content">
+      <div class="bhms-toast-row">
+        <div class="bhms-toast-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="bhms-toast-body">
+          <div class="bhms-toast-title">Success</div>
+          <div class="bhms-toast-message"><?= htmlspecialchars($success) ?></div>
+        </div>
+      </div>
+      <button type="button" class="bhms-toast-ok" onclick="bhmsDismissToast('bhmsToastSuccess')">OK</button>
+    </div>
+  </div>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
+
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h3><i class="fa-solid fa-person-pregnant me-2" style="color:var(--bhms-blue);"></i>Maternal Health Monitoring</h3>
@@ -275,48 +270,31 @@ if (!isset($records)) { return; }
   </div>
 
   <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-
-  <?php if ($success): ?>
-  <div class="popup-overlay" id="successOverlay">
-    <div class="popup-toast" id="successPopup">
-      <i class="fa-solid fa-circle-check"></i>
-      <div><?= htmlspecialchars($success) ?></div>
-      <button type="button" class="popup-close" onclick="document.getElementById('successOverlay').remove()" aria-label="Close">&times;</button>
-    </div>
-  </div>
-  <script>
-    document.getElementById('successOverlay').addEventListener('click', function (e) {
-      if (e.target === this) { this.remove(); }
-    });
-    setTimeout(function () {
-      var overlay = document.getElementById('successOverlay');
-      if (overlay) {
-        overlay.style.opacity = '0';
-        setTimeout(function () { overlay.remove(); }, 300);
-      }
-    }, 3500);
-  </script>
-  <?php endif; ?>
+  <?php if ($success): ?><div class="alert alert-success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
 
   <div class="card mb-4">
     <div class="card-body">
       <h5 class="card-title"><i class="fa-solid fa-user-plus me-2"></i>Register pregnant resident</h5>
-      <form method="POST" action="">
+      <form method="POST" action="" id="maternalForm">
         <div class="row g-3">
           <div class="col-md-4">
             <label class="form-label">Resident</label>
-            <select name="resident_id" class="form-select" required>
+            <select name="resident_id" id="resident_id" class="form-select" required>
               <option value="">Select resident</option>
               <?php foreach ($female_residents as $fr): ?>
-                <option value="<?= $fr['resident_id'] ?>"><?= htmlspecialchars($fr['last_name'] . ', ' . $fr['first_name']) ?> (Purok <?= $fr['purok'] ?>)</option>
+                <option value="<?= $fr['resident_id'] ?>" data-purok="<?= htmlspecialchars($fr['purok']) ?>"><?= htmlspecialchars($fr['last_name'] . ', ' . $fr['first_name']) ?></option>
               <?php endforeach; ?>
             </select>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-2">
+            <label class="form-label">Purok</label>
+            <input type="text" id="resident_purok_display" class="form-control" placeholder="—" readonly tabindex="-1">
+          </div>
+          <div class="col-md-3">
             <label class="form-label">Last menstrual period (LMP)</label>
             <input type="date" name="lmp_date" id="lmp_date" class="form-control" required max="<?= date('Y-m-d') ?>">
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-label">Expected delivery date (EDD)</label>
             <input type="date" name="edd_date" id="edd_date" class="form-control">
           </div>
@@ -335,6 +313,8 @@ if (!isset($records)) { return; }
               <option value="High-risk">High-risk</option>
               <option value="Delivered">Delivered</option>
               <option value="Postpartum">Postpartum</option>
+              <option value="Referred to RHU">Referred to RHU</option>
+              <option value="Deceased">Deceased</option>
             </select>
           </div>
           <div class="col-md-12">
@@ -342,7 +322,7 @@ if (!isset($records)) { return; }
             <textarea name="health_conditions" class="form-control" rows="2"></textarea>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3"><i class="fa-solid fa-plus me-2"></i>Add record</button>
+        <button type="submit" id="maternalSubmitBtn" class="btn btn-primary mt-3"><i class="fa-solid fa-plus me-2"></i>Add record</button>
       </form>
     </div>
   </div>
@@ -363,7 +343,7 @@ if (!isset($records)) { return; }
         <td>Purok <?= htmlspecialchars($rec['purok']) ?></td>
         <td><?= htmlspecialchars($rec['lmp_date']) ?></td>
         <td><?= htmlspecialchars($rec['edd_date']) ?></td>
-        <td><?php $mstat_class = ['Ongoing' => 'status-badge-ongoing', 'High-risk' => 'status-badge-highrisk', 'Delivered' => 'status-badge-delivered', 'Postpartum' => 'status-badge-postpartum'][$rec['monitoring_status']] ?? 'status-badge-ongoing'; ?><span class="badge <?= $mstat_class ?>"><?= htmlspecialchars($rec['monitoring_status']) ?></span></td>
+        <td><?php $mstat_class = ['Ongoing' => 'status-badge-ongoing', 'High-risk' => 'status-badge-highrisk', 'Delivered' => 'status-badge-delivered', 'Postpartum' => 'status-badge-postpartum', 'Referred to RHU' => 'status-badge-referred', 'Deceased' => 'status-badge-deceased'][$rec['monitoring_status']] ?? 'status-badge-ongoing'; ?><span class="badge <?= $mstat_class ?>"><?= htmlspecialchars($rec['monitoring_status']) ?></span></td>
         <td><span class="badge bg-<?= $compliance['badge'] ?>"><?= htmlspecialchars($compliance['label']) ?></span></td>
         <td>
           <a href="checkups.php?id=<?= $rec['maternal_record_id'] ?>" class="btn btn-sm btn-outline-primary">View checkups</a>
@@ -410,6 +390,55 @@ document.getElementById('liveSearch').addEventListener('input', function() {
         row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
     });
 });
+</script>
+<script>
+document.getElementById('resident_id').addEventListener('change', function() {
+    const selected = this.options[this.selectedIndex];
+    const purok = selected.getAttribute('data-purok');
+    document.getElementById('resident_purok_display').value = purok ? ('Purok ' + purok) : '';
+});
+</script>
+<script>
+document.getElementById('maternalForm')?.addEventListener('submit', function () {
+  var btn = document.getElementById('maternalSubmitBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Please wait...';
+  }
+});
+</script>
+<script>
+function bhmsDismissToast(id) {
+  var el = document.getElementById(id);
+  if (!el) { return; }
+  el.classList.add('bhms-toast-hide');
+  el.addEventListener('animationend', function () {
+    el.remove();
+    var container = document.getElementById('bhmsToastContainer');
+    var backdrop = document.getElementById('bhmsToastBackdrop');
+    if (backdrop && container && container.children.length === 0) {
+      backdrop.classList.add('bhms-toast-hide');
+      backdrop.addEventListener('animationend', function () {
+        backdrop.remove();
+      }, { once: true });
+    }
+  }, { once: true });
+}
+document.getElementById('bhmsToastBackdrop')?.addEventListener('click', function () {
+  document.querySelectorAll('#bhmsToastContainer .bhms-toast').forEach(function (t) {
+    bhmsDismissToast(t.id);
+  });
+});
+// Auto-dismiss every toast after 3 seconds
+document.querySelectorAll('#bhmsToastContainer .bhms-toast').forEach(function (toast) {
+  setTimeout(function () {
+    bhmsDismissToast(toast.id);
+  }, 3000);
+});
+<?php if ($success): ?>
+document.getElementById('maternalForm')?.reset();
+document.getElementById('resident_purok_display').value = '';
+<?php endif; ?>
 </script>
     </main>
   </div>

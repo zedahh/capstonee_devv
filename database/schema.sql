@@ -262,3 +262,9 @@ INSERT INTO seasonal_risk_reference (disease_name, start_month, end_month, advis
 ('Diarrhea', 6, 11, 'Rainy season flooding can contaminate water sources, increasing risk of diarrhea and other waterborne illness. Residents are advised to boil drinking water and maintain proper sanitation, in addition to dry-season food safety precautions.'),
 ('Heat Stroke', 3, 5, 'Summer heat increases risk of heat exhaustion and heat stroke, especially among children and the elderly. Residents are advised to drink 7-8 glasses of water daily, avoid strenuous outdoor activity between 9 AM and 4 PM, and wear light, loose clothing.'),
 ('Sore Eyes (Conjunctivitis)', 3, 5, 'Summer season shows increased cases of sore eyes (conjunctivitis), part of DOH''s recognized "6S" summer health risks. Residents are advised to avoid touching their eyes with unwashed hands and to practice good hygiene.');
+
+ALTER TABLE disease_cases MODIFY status ENUM('Active', 'Under monitoring', 'Recovered', 'Referred to RHU', 'Deceased') NOT NULL DEFAULT 'Active';
+ALTER TABLE maternal_records MODIFY monitoring_status ENUM('Ongoing', 'High-risk', 'Delivered', 'Postpartum', 'Referred to RHU', 'Deceased') NOT NULL DEFAULT 'Ongoing';
+ALTER TABLE infant_records MODIFY monitoring_status ENUM('Normal', 'Underweight', 'At risk', 'Deceased') NOT NULL DEFAULT 'Normal';
+
+ALTER TABLE residents ADD COLUMN vital_status ENUM('Alive', 'Deceased') NOT NULL DEFAULT 'Alive';

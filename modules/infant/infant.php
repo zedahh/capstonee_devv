@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Dropdown: female residents, to optionally link as mother
-$mothers = $pdo->query("SELECT resident_id, first_name, last_name FROM residents WHERE gender = 'Female' AND is_active = 1 ORDER BY last_name")->fetchAll(PDO::FETCH_ASSOC);
+$mothers = $pdo->query("SELECT resident_id, first_name, last_name FROM residents WHERE gender = 'Female' AND is_active = 1 AND vital_status = 'Alive' ORDER BY last_name")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fully Immunized Child (FIC) status check against the DOH EPI schedule
 $epi_schedule = $pdo->query("SELECT * FROM epi_schedule")->fetchAll(PDO::FETCH_ASSOC);

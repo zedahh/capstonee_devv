@@ -370,6 +370,7 @@ if (!isset($infants)) { return; }
               <option value="Normal">Normal</option>
               <option value="Underweight">Underweight</option>
               <option value="At risk">At risk</option>
+              <option value="Deceased">Deceased</option>
             </select>
           </div>
         </div>
@@ -392,7 +393,14 @@ if (!isset($infants)) { return; }
         <td><?= htmlspecialchars($i['birth_date']) ?></td>
         <td>Purok <?= htmlspecialchars($i['purok']) ?></td>
         <td><?= $i['mother_last'] ? htmlspecialchars($i['mother_last'] . ', ' . $i['mother_first']) : '—' ?></td>
-        <td><?php $mstat_class = $i['monitoring_status'] === 'Normal' ? 'status-badge-normal' : ($i['monitoring_status'] === 'Underweight' ? 'status-badge-underweight' : 'status-badge-atrisk'); ?><span class="badge <?= $mstat_class ?>"><?= htmlspecialchars($i['monitoring_status']) ?></span></td>
+        <td><?php
+          $mstat_class = match($i['monitoring_status']) {
+              'Normal' => 'status-badge-normal',
+              'Underweight' => 'status-badge-underweight',
+              'Deceased' => 'status-badge-deceased',
+              default => 'status-badge-atrisk',
+          };
+        ?><span class="badge <?= $mstat_class ?>"><?= htmlspecialchars($i['monitoring_status']) ?></span></td>
         <td><span class="badge bg-<?= $fic['badge'] ?>"><?= htmlspecialchars($fic['label']) ?></span></td>
         <td>
           <a href="growth.php?id=<?= $i['infant_record_id'] ?>" class="btn btn-sm btn-outline-primary">Growth records</a>

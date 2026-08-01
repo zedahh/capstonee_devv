@@ -32,8 +32,8 @@ function getFicStatus($pdo, $infant_record_id, $birth_date, $epi_schedule) {
 }
 
 function getPrenatalComplianceStatus($pdo, $maternal_record_id, $lmp_date, $monitoring_status, $schedule) {
-    if (in_array($monitoring_status, ['Delivered', 'Postpartum'])) {
-        return ['label' => 'Delivered/postpartum', 'badge' => 'secondary', 'behind' => false];
+    if (in_array($monitoring_status, ['Delivered', 'Postpartum', 'Referred to RHU', 'Deceased'])) {
+        return ['label' => $monitoring_status, 'badge' => 'secondary', 'behind' => false];
     }
     if (!$lmp_date) {
         return ['label' => 'No LMP recorded', 'badge' => 'secondary', 'behind' => false];

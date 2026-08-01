@@ -187,6 +187,48 @@ if (!isset($infants)) { return; }
   .status-badge-normal { background: var(--bhms-success-light); color: var(--bhms-success-dark); }
   .status-badge-underweight { background: var(--bhms-warning-light); color: #8a5a12; }
   .status-badge-atrisk { background: var(--bhms-danger-light); color: #8a2c2c; }
+
+  /* Floating success popup — centered modal-style, covers register/archive, auto-dismisses */
+  .popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,24,28,0.35);
+    z-index: 1070;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: overlayIn 0.25s ease;
+    transition: opacity 0.3s ease;
+  }
+  .popup-toast {
+    position: relative;
+    z-index: 1080;
+    min-width: 300px;
+    max-width: 420px;
+    background: #fff;
+    border-left: 4px solid var(--bhms-success);
+    border-radius: var(--bhms-radius-lg);
+    box-shadow: var(--bhms-shadow-md);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--bhms-gray-800);
+    animation: popupIn 0.3s ease;
+  }
+  .popup-toast i { color: var(--bhms-success); font-size: 1.3rem; margin-top: 0.1rem; }
+  .popup-toast .popup-close {
+    margin-left: auto; background: none; border: none; color: var(--bhms-gray-400);
+    cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0;
+  }
+  .popup-toast .popup-close:hover { color: var(--bhms-gray-600); }
+  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes popupIn {
+    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .popup-overlay, .popup-toast { animation: none; } }
 </style>
 </head>
 <body class="bhms-app-body">
@@ -240,7 +282,28 @@ if (!isset($infants)) { return; }
   </div>
 
   <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-  <?php if ($success): ?><div class="alert alert-success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
+
+  <?php if ($success): ?>
+  <div class="popup-overlay" id="successOverlay">
+    <div class="popup-toast" id="successPopup">
+      <i class="fa-solid fa-circle-check"></i>
+      <div><?= htmlspecialchars($success) ?></div>
+      <button type="button" class="popup-close" onclick="document.getElementById('successOverlay').remove()" aria-label="Close">&times;</button>
+    </div>
+  </div>
+  <script>
+    document.getElementById('successOverlay').addEventListener('click', function (e) {
+      if (e.target === this) { this.remove(); }
+    });
+    setTimeout(function () {
+      var overlay = document.getElementById('successOverlay');
+      if (overlay) {
+        overlay.style.opacity = '0';
+        setTimeout(function () { overlay.remove(); }, 300);
+      }
+    }, 3500);
+  </script>
+  <?php endif; ?>
 
   <div class="card mb-4">
     <div class="card-body">

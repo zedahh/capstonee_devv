@@ -54,7 +54,6 @@ if (!isset($record)) { return; }
   a { color: var(--bhms-blue); text-decoration: none; }
   a:hover { color: var(--bhms-blue-dark); }
 
-  /* ---- App shell: sidebar + topbar ---- */
   .bhms-shell { display: flex; min-height: 100vh; }
   .bhms-sidebar-checkbox { display: none; }
   .bhms-sidebar {
@@ -66,11 +65,12 @@ if (!isset($record)) { return; }
     transition: transform 0.25s ease;
   }
   .bhms-sidebar-brand { display: flex; align-items: center; gap: 0.8rem; padding: 1.5rem 1.35rem; border-bottom: 1px solid rgba(255,255,255,0.14); }
-  .bhms-sidebar-brand i {
+  .bhms-sidebar-brand i, .bhms-sidebar-brand img.brand-logo {
     font-size: 1.6rem; color: #fff; background: rgba(255,255,255,0.14);
     height: 42px; width: 42px; display: flex; align-items: center; justify-content: center;
     border-radius: var(--bhms-radius-sm); flex-shrink: 0;
   }
+  .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
   .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
@@ -174,7 +174,7 @@ if (!isset($record)) { return; }
   <input type="checkbox" id="bhmsSidebarToggle" class="bhms-sidebar-checkbox">
   <aside class="bhms-sidebar">
     <div class="bhms-sidebar-brand">
-      <i class="fa-solid fa-notes-medical"></i>
+      <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
         <span class="bhms-brand-title">Barangay Santa Ines</span>
         <span class="bhms-brand-sub">Health Monitoring System</span>

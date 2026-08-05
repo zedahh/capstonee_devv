@@ -47,6 +47,9 @@
     font-size: 0.78rem; font-weight: 500; letter-spacing: 0.03em;
     margin-bottom: 0.9rem;
   }
+  .masthead .badge-eyebrow img.badge-logo {
+    height: 20px; width: 20px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+  }
   .masthead h1 { font-weight: 600; font-size: 1.6rem; margin-bottom: 0.35rem; }
   .masthead p { opacity: 0.85; font-size: 0.92rem; margin: 0; }
 
@@ -112,7 +115,7 @@
 <body>
 
 <div class="masthead">
-  <span class="badge-eyebrow"><i class="fa-solid fa-notes-medical"></i> Barangay Santa Ines Health Center</span>
+  <span class="badge-eyebrow"><img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="badge-logo"> Barangay Santa Ines Health Center</span>
   <h1>Health Announcements</h1>
   <p>Vaccination schedules, health advisories, and community updates</p>
 </div>

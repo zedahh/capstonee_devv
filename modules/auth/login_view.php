@@ -53,19 +53,17 @@
     to { opacity: 1; transform: translateY(0); }
   }
   .login-icon-ring {
-    width: 78px; height: 78px;
+    width: 88px; height: 88px;
     margin: 0 auto 1.25rem;
     border-radius: 50%;
     background: linear-gradient(135deg, rgba(27,95,192,0.15), rgba(18,63,135,0.15));
     display: flex; align-items: center; justify-content: center;
+    padding: 5px;
   }
-  .login-icon-badge {
-    width: 58px; height: 58px;
+  .login-logo {
+    width: 100%; height: 100%;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1B5FC0, #123F87);
-    color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem;
+    object-fit: cover;
     box-shadow: 0 8px 24px rgba(30, 41, 59, 0.10);
   }
   .login-title { font-weight: 600; color: #2C333A; }
@@ -141,9 +139,7 @@
   <div class="login-wrap">
     <div class="login-glass-card">
       <div class="login-icon-ring">
-        <div class="login-icon-badge">
-          <i class="fa-solid fa-notes-medical"></i>
-        </div>
+        <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="login-logo">
       </div>
       <h4 class="text-center mb-1 login-title">Barangay Santa Ines</h4>
       <p class="text-center text-muted mb-4 login-subtitle">Health Monitoring System</p>

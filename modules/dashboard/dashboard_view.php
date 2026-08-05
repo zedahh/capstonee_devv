@@ -81,11 +81,12 @@ if (!isset($total_residents)) { return; }
     transition: transform 0.25s ease;
   }
   .bhms-sidebar-brand { display: flex; align-items: center; gap: 0.8rem; padding: 1.5rem 1.35rem; border-bottom: 1px solid rgba(255,255,255,0.14); }
-  .bhms-sidebar-brand i {
+  .bhms-sidebar-brand i, .bhms-sidebar-brand img.brand-logo {
     font-size: 1.6rem; color: #fff; background: rgba(255,255,255,0.14);
     height: 42px; width: 42px; display: flex; align-items: center; justify-content: center;
     border-radius: var(--bhms-radius-sm); flex-shrink: 0;
   }
+  .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
   .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
@@ -257,7 +258,7 @@ if (!isset($total_residents)) { return; }
   <input type="checkbox" id="bhmsSidebarToggle" class="bhms-sidebar-checkbox">
   <aside class="bhms-sidebar">
     <div class="bhms-sidebar-brand">
-      <i class="fa-solid fa-notes-medical"></i>
+      <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
         <span class="bhms-brand-title">Barangay Santa Ines</span>
         <span class="bhms-brand-sub">Health Monitoring System</span>
@@ -277,7 +278,6 @@ if (!isset($total_residents)) { return; }
       <div class="bhms-nav-divider">Admin</div>
       <a href="../admin/audit_log.php" class="bhms-nav-link"><i class="fa-solid fa-clipboard-list"></i><span>Audit Log</span></a>
       <a href="../admin/lgu_contacts.php" class="bhms-nav-link"><i class="fa-solid fa-address-book"></i><span>LGU Contacts</span></a>
-      <a href="../admin/archive.php" class="bhms-nav-link"><i class="fa-solid fa-box-archive"></i><span>Archive</span></a>
       <?php endif; ?>
     </nav>
     <div class="bhms-sidebar-footer">

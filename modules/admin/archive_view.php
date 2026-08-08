@@ -146,6 +146,80 @@
   .table-striped > tbody > tr:nth-of-type(odd) > * { background-color: var(--bhms-gray-50); }
   .table > tbody > tr:hover > * { background-color: var(--bhms-blue-light); }
   .type-badge { font-size: 0.7rem; padding: 0.3em 0.7em; border-radius: 999px; font-weight: 600; background: var(--bhms-blue-light); color: var(--bhms-blue-dark); }
+
+  /* Floating toast notifications (centered) */
+  .bhms-toast-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,24,28,0.45);
+    z-index: 1999;
+    animation: bhmsBackdropIn 0.2s ease;
+  }
+  .bhms-toast-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: calc(100% - 48px);
+    max-width: 420px;
+  }
+  .bhms-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: #fff;
+    border-radius: var(--bhms-radius-lg);
+    box-shadow: var(--bhms-shadow-md);
+    padding: 1.25rem 1.4rem;
+    border-left: 4px solid transparent;
+    animation: bhmsToastIn 0.25s ease;
+  }
+  .bhms-toast-danger { border-left-color: var(--bhms-danger); }
+  .bhms-toast-success { border-left-color: var(--bhms-success); }
+  .bhms-toast-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .bhms-toast-danger .bhms-toast-icon { color: var(--bhms-danger); }
+  .bhms-toast-success .bhms-toast-icon { color: var(--bhms-success); }
+  .bhms-toast-body { flex: 1 1 auto; min-width: 0; }
+  .bhms-toast-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
+  .bhms-toast-danger .bhms-toast-title { color: #8a2c2c; }
+  .bhms-toast-success .bhms-toast-title { color: var(--bhms-success-darker); }
+  .bhms-toast-message { font-size: 0.88rem; color: var(--bhms-gray-600); line-height: 1.45; word-break: break-word; }
+  .bhms-toast-ok {
+    display: block;
+    margin-left: auto;
+    margin-top: 0.9rem;
+    border: none;
+    background: linear-gradient(135deg, var(--bhms-blue), var(--bhms-blue-dark));
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 0.4rem 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+  }
+  .bhms-toast-ok:hover { filter: brightness(0.95); }
+  .bhms-toast-content { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
+  .bhms-toast-row { display: flex; align-items: flex-start; gap: 0.75rem; }
+  .bhms-toast.bhms-toast-hide { animation: bhmsToastOut 0.18s ease forwards; }
+  .bhms-toast-backdrop.bhms-toast-hide { animation: bhmsBackdropOut 0.18s ease forwards; }
+  @keyframes bhmsToastIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes bhmsToastOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.92); }
+  }
+  @keyframes bhmsBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes bhmsBackdropOut { from { opacity: 1; } to { opacity: 0; } }
+  @media (max-width: 576px) {
+    .bhms-toast-container { width: calc(100% - 32px); }
+  }
 </style>
 </head>
 <body class="bhms-app-body">
@@ -192,14 +266,46 @@
       </div>
     </header>
     <main class="bhms-content">
+
+<?php if ($error || $success): ?>
+<div class="bhms-toast-backdrop" id="bhmsToastBackdrop"></div>
+<div class="bhms-toast-container" id="bhmsToastContainer">
+  <?php if ($error): ?>
+  <div class="bhms-toast bhms-toast-danger" id="bhmsToastError">
+    <div class="bhms-toast-content">
+      <div class="bhms-toast-row">
+        <div class="bhms-toast-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+        <div class="bhms-toast-body">
+          <div class="bhms-toast-title">Something went wrong</div>
+          <div class="bhms-toast-message"><?= htmlspecialchars($error) ?></div>
+        </div>
+      </div>
+      <button type="button" class="bhms-toast-ok" onclick="bhmsDismissToast('bhmsToastError')">OK</button>
+    </div>
+  </div>
+  <?php endif; ?>
+  <?php if ($success): ?>
+  <div class="bhms-toast bhms-toast-success" id="bhmsToastSuccess">
+    <div class="bhms-toast-content">
+      <div class="bhms-toast-row">
+        <div class="bhms-toast-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="bhms-toast-body">
+          <div class="bhms-toast-title">Success</div>
+          <div class="bhms-toast-message"><?= htmlspecialchars($success) ?></div>
+        </div>
+      </div>
+      <button type="button" class="bhms-toast-ok" onclick="bhmsDismissToast('bhmsToastSuccess')">OK</button>
+    </div>
+  </div>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
+
     <div class="container py-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h3><i class="fa-solid fa-box-archive me-2" style="color:var(--bhms-blue);"></i>Archive</h3>
         <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
       </div>
-
-      <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-      <?php if ($success): ?><div class="alert alert-success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
 
       <div class="card">
         <div class="card-body">
@@ -289,6 +395,35 @@ document.getElementById('deleteConfirmInput').addEventListener('input', function
 
 document.getElementById('deleteConfirmBtn').addEventListener('click', function() {
     window.location.href = '?delete=' + currentDeleteType + ':' + currentDeleteId;
+});
+</script>
+<script>
+function bhmsDismissToast(id) {
+  var el = document.getElementById(id);
+  if (!el) { return; }
+  el.classList.add('bhms-toast-hide');
+  el.addEventListener('animationend', function () {
+    el.remove();
+    var container = document.getElementById('bhmsToastContainer');
+    var backdrop = document.getElementById('bhmsToastBackdrop');
+    if (backdrop && container && container.children.length === 0) {
+      backdrop.classList.add('bhms-toast-hide');
+      backdrop.addEventListener('animationend', function () {
+        backdrop.remove();
+      }, { once: true });
+    }
+  }, { once: true });
+}
+document.getElementById('bhmsToastBackdrop')?.addEventListener('click', function () {
+  document.querySelectorAll('#bhmsToastContainer .bhms-toast').forEach(function (t) {
+    bhmsDismissToast(t.id);
+  });
+});
+// Auto-dismiss every toast after 3 seconds
+document.querySelectorAll('#bhmsToastContainer .bhms-toast').forEach(function (toast) {
+  setTimeout(function () {
+    bhmsDismissToast(toast.id);
+  }, 3000);
 });
 </script>
 </body>

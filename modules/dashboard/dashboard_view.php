@@ -113,7 +113,183 @@ if (!isset($total_residents)) { return; }
   .bhms-topbar-user { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--bhms-gray-600); white-space: nowrap; }
   .bhms-topbar-user i { font-size: 1.3rem; color: var(--bhms-gray-400); }
   .bhms-topbar-user .bhms-role-pill { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; background: var(--bhms-blue-light); color: var(--bhms-blue-dark); padding: 0.15rem 0.55rem; border-radius: 999px; font-weight: 600; }
-  .bhms-content { flex: 1 1 auto; padding-bottom: 2rem; }
+  .bhms-content { flex: 1 1 auto; padding-bottom: 1rem; }
+  .dashboard-page .container { max-width: 1440px; padding-top: 1rem !important; }
+  .dashboard-page .mb-4 { margin-bottom: 0.85rem !important; }
+  .dashboard-page .mb-3 { margin-bottom: 0.65rem !important; }
+
+  /* Compact dashboard layout */
+  .dashboard-page .welcome-banner {
+    padding: 0.85rem 1.15rem;
+    min-height: 72px;
+  }
+  .dashboard-page .welcome-icon-badge {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+  .dashboard-page .welcome-banner h3 {
+    font-size: 1.15rem;
+  }
+  .dashboard-page .welcome-banner-sub {
+    font-size: 0.75rem;
+  }
+
+  .dashboard-page .stat-card {
+    padding: 0.85rem 0.7rem !important;
+    min-height: 128px;
+  }
+  .dashboard-page .stat-card-icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 0.45rem;
+    font-size: 0.9rem;
+  }
+  .dashboard-page .stat-card h6 {
+    font-size: 0.68rem;
+    margin-bottom: 0.15rem;
+  }
+  .dashboard-page .stat-card .fs-4 {
+    font-size: 1.45rem !important;
+  }
+
+  .dashboard-page .card-body {
+    padding: 1rem;
+  }
+  .dashboard-page .card-title {
+    font-size: 0.92rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .dashboard-page .dashboard-alert-card .card-body {
+    padding: 0.85rem 1rem;
+  }
+  .dashboard-alert-scroll {
+    max-height: 185px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .dashboard-alert-scroll .table {
+    margin-bottom: 0;
+  }
+
+  .dashboard-page .alert {
+    padding: 0.55rem 0.8rem;
+    margin-bottom: 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  .dashboard-middle-row > [class*="col-"] {
+    display: flex;
+  }
+  .dashboard-middle-row .card {
+    width: 100%;
+  }
+
+  .dashboard-page .chart-card {
+    padding: 0.85rem !important;
+    min-height: 270px;
+  }
+  .dashboard-page .chart-card h6 {
+    font-size: 0.82rem;
+    margin-bottom: 0.55rem;
+  }
+  .dashboard-page .chart-wrap {
+    position: relative;
+    height: 205px;
+  }
+  .dashboard-page .chart-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .dashboard-lower-row > [class*="col-"] {
+    display: flex;
+  }
+  .dashboard-lower-row .card {
+    width: 100%;
+  }
+
+  .dashboard-trend-scroll {
+    max-height: 210px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .dashboard-trend-scroll .table {
+    margin-bottom: 0;
+  }
+
+  .dashboard-page .quick-actions-card .card-body {
+    padding: 0.8rem 1rem;
+  }
+  .dashboard-page .quick-actions-title {
+    margin-bottom: 0.55rem;
+  }
+  .dashboard-page .quick-actions-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+  .dashboard-page .quick-action-tile {
+    min-height: 58px;
+    padding: 0.55rem 0.35rem !important;
+    flex-direction: row;
+    gap: 0.45rem;
+  }
+  .dashboard-page .quick-action-tile i {
+    font-size: 0.9rem;
+  }
+  .dashboard-page .quick-action-tile span {
+    font-size: 0.68rem;
+  }
+
+  @media (max-width: 992px) {
+    .dashboard-page .quick-actions-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .dashboard-page .chart-card {
+      min-height: 250px;
+    }
+    .dashboard-page .chart-wrap {
+      height: 185px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-page .container {
+      padding-left: 0.8rem;
+      padding-right: 0.8rem;
+    }
+    .dashboard-page .welcome-banner {
+      align-items: flex-start !important;
+      gap: 0.65rem;
+      flex-direction: column;
+    }
+    .dashboard-page .welcome-banner > div:last-child {
+      width: 100%;
+    }
+    .dashboard-page .welcome-banner > div:last-child .btn {
+      margin-right: 0.25rem !important;
+      margin-bottom: 0.25rem;
+    }
+    .dashboard-page .quick-actions-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 576px) {
+    .dashboard-page .stat-card {
+      min-height: 112px;
+    }
+    .dashboard-page .stat-card .fs-4 {
+      font-size: 1.3rem !important;
+    }
+    .dashboard-page .chart-wrap {
+      height: 175px;
+    }
+    .dashboard-page .quick-actions-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
 
   @media (max-width: 992px) {
     .bhms-sidebar { transform: translateX(-100%); }
@@ -329,14 +505,14 @@ if (!isset($total_residents)) { return; }
     $moderate_count = count($active_alerts) - $high_count;
   ?>
   <?php if (!empty($active_alerts)): ?>
-  <div class="card mb-4">
+  <div class="card mb-4 dashboard-alert-card">
     <div class="card-body">
       <h5 class="card-title">
         <i class="fa-solid fa-triangle-exclamation me-2" style="color:var(--bhms-danger);"></i>Active Health Alerts
         <span class="badge bg-danger ms-2"><?= $high_count ?> high</span>
         <span class="badge bg-warning text-dark ms-1"><?= $moderate_count ?> moderate</span>
       </h5>
-      <div class="table-responsive">
+      <div class="table-responsive dashboard-alert-scroll">
       <table class="table table-sm align-middle mb-0">
         <thead><tr><th>Purok</th><th>Disease</th><th>Cases</th><th>Risk</th><th>Actions</th></tr></thead>
         <tbody>
@@ -418,42 +594,52 @@ if (!isset($total_residents)) { return; }
     <div class="col-md-3"><div class="card p-3 text-center stat-card stat-card-monthly"><div class="stat-card-icon"><i class="fa-solid fa-calendar-check"></i></div><h6>Cases reported this month</h6><p class="fs-4 mb-0"><?= $cases_this_month ?></p></div></div>
   </div>
 
-  <div class="row g-3 mb-4">
+  <div class="row g-3 mb-4 dashboard-middle-row">
     <div class="col-md-6">
       <div class="card p-3 chart-card">
         <h6><i class="fa-solid fa-chart-column me-2" style="color:var(--bhms-blue);"></i>Active cases by purok</h6>
-        <canvas id="purokChart" height="200"></canvas>
+        <div class="chart-wrap">
+          <canvas id="purokChart"></canvas>
+        </div>
       </div>
     </div>
     <div class="col-md-6">
       <div class="card p-3 chart-card">
         <h6><i class="fa-solid fa-chart-line me-2" style="color:var(--bhms-blue);"></i>Case trend, last 6 months</h6>
-        <canvas id="trendChart" height="200"></canvas>
+        <div class="chart-wrap">
+          <canvas id="trendChart"></canvas>
+        </div>
       </div>
     </div>
   </div>
 
-  <?php if (!empty($disease_trends)): ?>
-  <div class="card mb-4">
-    <div class="card-body">
-      <h5 class="card-title"><i class="fa-solid fa-arrow-trend-up me-2"></i>Disease trend indicators <small class="text-muted">(month-over-month, based on recorded cases)</small></h5>
-      <table class="table table-sm mb-0">
-        <thead><tr><th>Disease</th><th>Trend</th></tr></thead>
-        <tbody>
-          <?php foreach ($disease_trends as $disease => $months): $trend = getTrendInfo($months); ?>
-          <tr>
-            <td><?= htmlspecialchars($disease) ?></td>
-            <td><span class="badge bg-<?= $trend['badge'] ?>"><?= htmlspecialchars($trend['label']) ?></span></td>
-          </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+  <div class="row g-3 mb-3 dashboard-lower-row">
+    <?php if (!empty($disease_trends)): ?>
+    <div class="col-lg-6">
+      <div class="card h-100 mb-0">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fa-solid fa-arrow-trend-up me-2"></i>Disease trend indicators <small class="text-muted">(month-over-month, based on recorded cases)</small></h5>
+          <div class="dashboard-trend-scroll">
+          <table class="table table-sm mb-0">
+            <thead><tr><th>Disease</th><th>Trend</th></tr></thead>
+            <tbody>
+              <?php foreach ($disease_trends as $disease => $months): $trend = getTrendInfo($months); ?>
+              <tr>
+                <td><?= htmlspecialchars($disease) ?></td>
+                <td><span class="badge bg-<?= $trend['badge'] ?>"><?= htmlspecialchars($trend['label']) ?></span></td>
+              </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <?php endif; ?>
+    <?php endif; ?>
 
-  <div class="card quick-actions-card mb-3">
-    <div class="card-body">
+    <div class="<?= !empty($disease_trends) ? 'col-lg-6' : 'col-12' ?>">
+      <div class="card quick-actions-card h-100 mb-0">
+        <div class="card-body">
     <h6 class="quick-actions-title"><i class="fa-solid fa-bolt me-2"></i>Quick Actions</h6>
     <div class="mb-0 quick-actions-grid">
     <a href="../residents/residents.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-users"></i><span>Resident Profiling</span></a>
@@ -465,6 +651,8 @@ if (!isset($total_residents)) { return; }
     <a href="../reports/reports.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-file-lines"></i><span>Reports</span></a>
     <a href="../announcements/announcements.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-bullhorn"></i><span>Announcements</span></a>
     </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -490,6 +678,7 @@ new Chart(document.getElementById('purokChart'), {
         }]
     },
     options: {
+        maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
             tooltip: {
@@ -525,6 +714,7 @@ new Chart(document.getElementById('trendChart'), {
         }]
     },
     options: {
+        maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
     }

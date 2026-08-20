@@ -8,7 +8,7 @@ require '../../config/database.php';
 require '../../includes/functions.php';
 require '../../vendor/autoload.php';
 
-$total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active = 1 AND vital_status = 'Alive'")->fetchColumn();
+$total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active = 1")->fetchColumn();
 $total_maternal = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk') AND is_active = 1")->fetchColumn();
 $total_infants = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) AND ir.is_active = 1 AND ir.monitoring_status != 'Deceased'")->fetchColumn();
 $total_vaccinations = $pdo->query("SELECT COUNT(*) FROM vaccination_records")->fetchColumn();

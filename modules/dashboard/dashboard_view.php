@@ -90,6 +90,7 @@ if (!isset($total_residents)) { return; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
   .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
+  
   .bhms-nav-link {
     display: flex; align-items: center; gap: 0.75rem; padding: 0.62rem 0.9rem; margin-bottom: 0.2rem;
     border-radius: 10px; color: rgba(255,255,255,0.85); font-size: 0.885rem; font-weight: 500;

@@ -24,7 +24,7 @@ $disease_breakdown = $pdo->query("
 $purok_breakdown = $pdo->query("
     SELECT r.purok, COUNT(*) as total
     FROM residents r
-    WHERE r.is_active = 1 AND r.vital_status = 'Alive'
+    WHERE r.is_active = 1
     GROUP BY r.purok
     ORDER BY r.purok
 ")->fetchAll(PDO::FETCH_ASSOC);

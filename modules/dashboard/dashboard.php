@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start();    
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php');
     exit;
@@ -7,9 +7,9 @@ if (!isset($_SESSION['user_id'])) {
 require '../../config/database.php';
 require '../../includes/functions.php';
 
-$total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active = 1 AND vital_status = 'Alive'")->fetchColumn();
+$total_residents = $pdo->query("SELECT COUNT(*) FROM residents WHERE is_active = 1")->fetchColumn();
 $pregnant_count = $pdo->query("SELECT COUNT(*) FROM maternal_records WHERE monitoring_status IN ('Ongoing', 'High-risk') AND is_active = 1")->fetchColumn();
-$infant_count = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) AND ir.is_active = 1 AND ir.monitoring_status != 'Deceased'")->fetchColumn();
+$infant_count = $pdo->query("SELECT COUNT(*) FROM infant_records ir JOIN residents r ON ir.resident_id = r.resident_id WHERE r.birth_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) AND ir.is_active = 1")->fetchColumn();
 $disease_count = $pdo->query("SELECT COUNT(*) FROM disease_cases WHERE status IN ('Active', 'Under monitoring') AND is_active = 1")->fetchColumn();
 
 // Total cases reported this calendar month, regardless of current status
@@ -29,10 +29,9 @@ $threshold_alerts = $pdo->query("
     HAVING case_count >= 1
     ORDER BY case_count DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
-
 function getRiskLevel($count, $population) {
     if ($population <= 0) return 'low';
-    $rate = ($count / $population) * 100;
+    $rate = ($count / $population) * 100;   
     if ($rate >= 7) return 'high';
     if ($rate >= 3) return 'moderate';
     return 'low';
@@ -97,7 +96,7 @@ $infants_for_fic = $pdo->query("
     SELECT infant_records.infant_record_id, r.birth_date
     FROM infant_records
     JOIN residents r ON infant_records.resident_id = r.resident_id
-    WHERE infant_records.is_active = 1 AND infant_records.monitoring_status != 'Deceased'
+    WHERE infant_records.is_active = 1
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 $overdue_infant_count = 0;
@@ -126,7 +125,7 @@ foreach ($purok_chart_raw as $row) {
 $purok_population_raw = $pdo->query("
     SELECT purok, COUNT(*) as total
     FROM residents
-    WHERE is_active = 1 AND vital_status = 'Alive'
+    WHERE is_active = 1
     GROUP BY purok
 ")->fetchAll(PDO::FETCH_ASSOC);
 $purok_population = [1 => 0, 2 => 0, 3 => 0, 4 => 0];

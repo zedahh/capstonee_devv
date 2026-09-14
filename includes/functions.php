@@ -72,17 +72,27 @@ function getPrenatalComplianceStatus($pdo, $maternal_record_id, $lmp_date, $moni
 
 
 function sendSms($pdo, $phone_number, $message, $purpose, $user_id) {
-    // SIMULATED SEND — logs to sms_log as if sent, no real API call.
-    // At deployment, replace the body of this function with a real call to
-    // Semaphore's API (https://semaphore.co/api/v4/messages), keeping the same
-    // function name and parameters so nothing else in the system needs to change.
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'https://unismsapi.com/api/sms');
+    curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'recipient' => $phone_number,
+        'content' => $message,
+        'sender_id' => 'Unisoft'
+    ]));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_USERPWD, SMS_API_KEY . ':');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    $curl_error = curl_error($ch);
+    curl_close($ch);
 
-    $stmt = $pdo->prepare("INSERT INTO sms_log (phone_number, message, purpose, status, sent_by) VALUES (?, ?, ?, 'simulated', ?)");
+    
+    $stmt = $pdo->prepare("INSERT INTO sms_log (phone_number, message, purpose, status, sent_by) VALUES (?, ?, ?, 'sent', ?)");
     $stmt->execute([$phone_number, $message, $purpose, $user_id]);
 
     return true;
 }
-
 
 
 // Point-in-polygon test (ray casting) - determines if a lat/lng falls inside a polygon

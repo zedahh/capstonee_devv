@@ -91,6 +91,45 @@ if (!isset($total_residents)) { return; }
   .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
   
+
+.bhms-nav::-webkit-scrollbar {
+  width: 10px;
+}
+.bhms-nav::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+}
+.bhms-nav::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.25);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.2s ease;
+}
+.bhms-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.6);
+  background-clip: padding-box;
+}
+.bhms-nav::-webkit-scrollbar-button {
+  display: block;
+  height: 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 7px;
+  transition: background-color 0.2s ease;
+}
+.bhms-nav::-webkit-scrollbar-button:hover {
+  background-color: rgba(255,255,255,0.15);
+}
+.bhms-nav::-webkit-scrollbar-button:vertical:start:decrement {
+  border-radius: 999px 999px 0 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='white' fill-opacity='0.6' d='M12 6l7 8H5z'/></svg>");
+}
+.bhms-nav::-webkit-scrollbar-button:vertical:end:increment {
+  border-radius: 0 0 999px 999px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='white' fill-opacity='0.6' d='M12 18l-7-8h14z'/></svg>");
+}
   .bhms-nav-link {
     display: flex; align-items: center; gap: 0.75rem; padding: 0.62rem 0.9rem; margin-bottom: 0.2rem;
     border-radius: 10px; color: rgba(255,255,255,0.85); font-size: 0.885rem; font-weight: 500;
@@ -298,9 +337,7 @@ if (!isset($total_residents)) { return; }
     .bhms-sidebar-checkbox:checked ~ .bhms-overlay { display: block; }
     .bhms-main { margin-left: 0; }
     .bhms-menu-btn { display: flex; }
-    .bhms-topbar-title { font-size: 0.95rem; }
-  }
-  @media (max-width: 576px) {
+    .bhms-topbar-title { font-size: 0.95rem; }-[=]
     .bhms-topbar-user span:not(.bhms-role-pill) { display: none; }
   }
 
@@ -505,6 +542,36 @@ if (!isset($total_residents)) { return; }
     $high_count = count(array_filter($active_alerts, fn($a) => $a['level'] === 'high'));
     $moderate_count = count($active_alerts) - $high_count;
   ?>
+
+<!-- number here -->
+ 
+  <div class="row g-3 mb-4">
+    <div class="col-md-2"><div class="card p-3 text-center stat-card stat-card-residents"><div class="stat-card-icon"><i class="fa-solid fa-users"></i></div><h6>Total residents</h6><p class="fs-4 mb-0"><?= $total_residents ?></p></div></div>
+    <div class="col-md-2"><div class="card p-3 text-center stat-card stat-card-pregnant"><div class="stat-card-icon"><i class="fa-solid fa-person-pregnant"></i></div><h6>Pregnant women</h6><p class="fs-4 mb-0"><?= $pregnant_count ?></p></div></div>
+    <div class="col-md-2"><div class="card p-3 text-center stat-card stat-card-infants"><div class="stat-card-icon"><i class="fa-solid fa-baby"></i></div><h6>Infants 0-12mo</h6><p class="fs-4 mb-0"><?= $infant_count ?></p></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center stat-card stat-card-disease"><div class="stat-card-icon"><i class="fa-solid fa-virus"></i></div><h6>Active disease cases</h6><p class="fs-4 mb-0"><?= $disease_count ?></p></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center stat-card stat-card-monthly"><div class="stat-card-icon"><i class="fa-solid fa-calendar-check"></i></div><h6>Cases reported this month</h6><p class="fs-4 mb-0"><?= $cases_this_month ?></p></div></div>
+  </div>
+
+  <div class="row g-3 mb-4 dashboard-middle-row">
+    <div class="col-md-6">
+      <div class="card p-3 chart-card">
+        <h6><i class="fa-solid fa-chart-column me-2" style="color:var(--bhms-blue);"></i>Active cases by purok</h6>
+        <div class="chart-wrap">
+          <canvas id="purokChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-3 chart-card">
+        <h6><i class="fa-solid fa-chart-line me-2" style="color:var(--bhms-blue);"></i>Case trend, last 6 months</h6>
+        <div class="chart-wrap">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <?php if (!empty($active_alerts)): ?>
   <div class="card mb-4 dashboard-alert-card">
     <div class="card-body">
@@ -587,32 +654,6 @@ if (!isset($total_residents)) { return; }
   </div>
   <?php endif; ?>
 
-  <div class="row g-3 mb-4">
-    <div class="col-md-2"><div class="card p-3 text-center stat-card stat-card-residents"><div class="stat-card-icon"><i class="fa-solid fa-users"></i></div><h6>Total residents</h6><p class="fs-4 mb-0"><?= $total_residents ?></p></div></div>
-    <div class="col-md-2"><div class="card p-3 text-center stat-card stat-card-pregnant"><div class="stat-card-icon"><i class="fa-solid fa-person-pregnant"></i></div><h6>Pregnant women</h6><p class="fs-4 mb-0"><?= $pregnant_count ?></p></div></div>
-    <div class="col-md-2"><div class="card p-3 text-center stat-card stat-card-infants"><div class="stat-card-icon"><i class="fa-solid fa-baby"></i></div><h6>Infants 0-12mo</h6><p class="fs-4 mb-0"><?= $infant_count ?></p></div></div>
-    <div class="col-md-3"><div class="card p-3 text-center stat-card stat-card-disease"><div class="stat-card-icon"><i class="fa-solid fa-virus"></i></div><h6>Active disease cases</h6><p class="fs-4 mb-0"><?= $disease_count ?></p></div></div>
-    <div class="col-md-3"><div class="card p-3 text-center stat-card stat-card-monthly"><div class="stat-card-icon"><i class="fa-solid fa-calendar-check"></i></div><h6>Cases reported this month</h6><p class="fs-4 mb-0"><?= $cases_this_month ?></p></div></div>
-  </div>
-
-  <div class="row g-3 mb-4 dashboard-middle-row">
-    <div class="col-md-6">
-      <div class="card p-3 chart-card">
-        <h6><i class="fa-solid fa-chart-column me-2" style="color:var(--bhms-blue);"></i>Active cases by purok</h6>
-        <div class="chart-wrap">
-          <canvas id="purokChart"></canvas>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card p-3 chart-card">
-        <h6><i class="fa-solid fa-chart-line me-2" style="color:var(--bhms-blue);"></i>Case trend, last 6 months</h6>
-        <div class="chart-wrap">
-          <canvas id="trendChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="row g-3 mb-3 dashboard-lower-row">
     <?php if (!empty($disease_trends)): ?>
@@ -638,23 +679,7 @@ if (!isset($total_residents)) { return; }
     </div>
     <?php endif; ?>
 
-    <div class="<?= !empty($disease_trends) ? 'col-lg-6' : 'col-12' ?>">
-      <div class="card quick-actions-card h-100 mb-0">
-        <div class="card-body">
-    <h6 class="quick-actions-title"><i class="fa-solid fa-bolt me-2"></i>Quick Actions</h6>
-    <div class="mb-0 quick-actions-grid">
-    <a href="../residents/residents.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-users"></i><span>Resident Profiling</span></a>
-    <a href="../maternal/maternal.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-person-pregnant"></i><span>Maternal Health</span></a>
-    <a href="../infant/infant.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-baby"></i><span>Infant Monitoring</span></a>
-    <a href="../vaccination/vaccination.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-syringe"></i><span>Vaccination Records</span></a>
-    <a href="../disease/disease.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-virus"></i><span>Disease Recording</span></a>
-    <a href="../heatmap/heatmap.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-map-location-dot"></i><span>Heatmap</span></a>
-    <a href="../reports/reports.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-file-lines"></i><span>Reports</span></a>
-    <a href="../announcements/announcements.php" class="btn btn-primary btn-sm quick-action-tile"><i class="fa-solid fa-bullhorn"></i><span>Announcements</span></a>
-    </div>
-        </div>
-      </div>
-    </div>
+   
   </div>
 </div>
 

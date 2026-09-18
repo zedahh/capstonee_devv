@@ -10,6 +10,7 @@ if (!isset($infant)) { return; }
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="../../assets/images/barangay_logo.png">
 <title>Growth Monitoring</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,7 +73,7 @@ if (!isset($infant)) { return; }
   }
   .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
-  .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
+  .bhms-brand-sub { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
   .bhms-nav-link {
     display: flex; align-items: center; gap: 0.75rem; padding: 0.62rem 0.9rem; margin-bottom: 0.2rem;
@@ -176,8 +177,8 @@ if (!isset($infant)) { return; }
     <div class="bhms-sidebar-brand">
       <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
-        <span class="bhms-brand-title">Barangay Santa Ines</span>
-        <span class="bhms-brand-sub">Health Monitoring System</span>
+        <span class="bhms-brand-title">IneSight</span>
+        <span class="bhms-brand-sub">Health Monitoring & Decision Support</span>
       </div>
     </div>
     <nav class="bhms-nav">
@@ -253,7 +254,8 @@ if (!isset($infant)) { return; }
 
   <h5><i class="fa-solid fa-clock-rotate-left me-2"></i>Growth history</h5>
   <div class="growth-table-card">
-  <table class="table table-striped">
+  <div class="table-responsive">
+<table class="table table-striped">
     <thead>
       <tr><th>Visit date</th><th>Weight (kg)</th><th>Height (cm)</th><th>Notes</th></tr>
     </thead>
@@ -268,6 +270,7 @@ if (!isset($infant)) { return; }
       <?php endforeach; ?>
     </tbody>
   </table>
+  </div>
   </div>
 </div>
     </main>

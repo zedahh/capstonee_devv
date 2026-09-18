@@ -19,6 +19,7 @@ if (!isset($total_residents)) { return; }
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="../../assets/images/barangay_logo.png">
 <title>Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -88,7 +89,7 @@ if (!isset($total_residents)) { return; }
   }
   .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
-  .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
+  .bhms-brand-sub { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
   
 
@@ -185,9 +186,9 @@ if (!isset($total_residents)) { return; }
     margin-bottom: 0.45rem;
     font-size: 0.9rem;
   }
-  .dashboard-page .stat-card h6 {
-    font-size: 0.68rem;
-    margin-bottom: 0.15rem;
+    .dashboard-page .stat-card h6 {
+    font-size: 0.78rem;
+    margin-bottom: 0.2rem;
   }
   .dashboard-page .stat-card .fs-4 {
     font-size: 1.45rem !important;
@@ -360,7 +361,7 @@ if (!isset($total_residents)) { return; }
   .alert-warning { background: var(--bhms-warning-light); color: #8a5a12; border-left-color: var(--bhms-warning); }
   .alert-success { background: var(--bhms-success-light); color: var(--bhms-success-dark); border-left-color: var(--bhms-success); }
   .alert-info { background: var(--bhms-info-light); color: var(--bhms-blue-dark); border-left-color: var(--bhms-blue); }
-  .badge { font-weight: 600; padding: 0.4em 0.75em; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.02em; }
+    .badge { font-weight: 600; padding: 0.45em 0.85em; border-radius: 999px; font-size: 0.85rem; letter-spacing: 0.02em; }
   .badge.bg-danger { background-color: var(--bhms-danger) !important; }
 .badge.bg-warning { background-color: var(--bhms-warning) !important; color: #fff !important; }
 .badge.bg-info { background-color: var(--bhms-blue) !important; }
@@ -462,9 +463,23 @@ if (!isset($total_residents)) { return; }
   .quick-action-tile i { font-size: 1.15rem; margin: 0 !important; }
   .quick-action-tile span { font-size: 0.76rem; line-height: 1.2; }
 
-  @media (prefers-reduced-motion: reduce) {
+   @media (prefers-reduced-motion: reduce) {
     .stat-card, .welcome-banner { animation: none; opacity: 1; }
   }
+
+  .notif-bell { position: relative; padding: 0.4rem 0.6rem; }
+  .notif-badge {
+    position: absolute; top: -4px; right: -4px;
+    font-size: 0.62rem; padding: 0.2em 0.42em; min-width: 17px;
+    border-radius: 999px; line-height: 1.2;
+  }
+  .notif-dropdown { min-width: 320px; max-width: 380px; padding: 0.5rem 0; }
+  .notif-item {
+    white-space: normal; font-size: 0.85rem; padding: 0.5rem 1rem;
+    border-left: 3px solid transparent; display: block;
+  }
+  .notif-success { border-left-color: var(--bhms-success); }
+  .notif-warning { border-left-color: var(--bhms-warning); }
 </style>
 </head>
 <body class="bhms-app-body">
@@ -474,8 +489,8 @@ if (!isset($total_residents)) { return; }
     <div class="bhms-sidebar-brand">
       <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
-        <span class="bhms-brand-title">Barangay Santa Ines</span>
-        <span class="bhms-brand-sub">Health Monitoring System</span>
+        <span class="bhms-brand-title">IneSight</span>
+        <span class="bhms-brand-sub">Health Monitoring & Decision Support</span>
       </div>
     </div>
     <nav class="bhms-nav">
@@ -501,9 +516,41 @@ if (!isset($total_residents)) { return; }
   </aside>
   <label for="bhmsSidebarToggle" class="bhms-overlay"></label>
   <div class="bhms-main">
+        <?php
+      $notif_count = 0;
+      if ($overdue_infant_count > 0) $notif_count++;
+      if ($behind_maternal_count > 0) $notif_count++;
+      if (isset($_GET['sms_sent']) || isset($_GET['sms_no_contacts'])) $notif_count++;
+    ?>
     <header class="bhms-topbar">
       <label for="bhmsSidebarToggle" class="bhms-menu-btn" aria-label="Toggle navigation"><i class="fa-solid fa-bars"></i></label>
       <div class="bhms-topbar-title">Dashboard</div>
+      <div class="dropdown me-2">
+        <button class="btn btn-outline-secondary btn-sm position-relative notif-bell" type="button" data-bs-toggle="dropdown" aria-label="Notifications">
+          <i class="fa-solid fa-bell" aria-hidden="true"></i>
+          <?php if ($notif_count > 0): ?>
+          <span class="badge bg-danger notif-badge"><?= $notif_count ?></span>
+          <?php endif; ?>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end notif-dropdown">
+          <li><h6 class="dropdown-header">Notifications</h6></li>
+          <?php if ($notif_count === 0): ?>
+          <li><span class="dropdown-item-text text-muted small">No new notifications</span></li>
+          <?php endif; ?>
+          <?php if (isset($_GET['sms_sent'])): ?>
+          <li><div class="dropdown-item-text notif-item notif-success"><i class="fa-solid fa-circle-check me-2" aria-hidden="true"></i><?= (int) $_GET['sms_sent'] ?> SMS notification(s) sent successfully to LGU contacts.</div></li>
+          <?php endif; ?>
+          <?php if (isset($_GET['sms_no_contacts'])): ?>
+          <li><div class="dropdown-item-text notif-item notif-warning"><i class="fa-solid fa-triangle-exclamation me-2" aria-hidden="true"></i>No SMS was sent — no LGU contacts on file. <a href="../admin/lgu_contacts.php">Add a contact</a></div></li>
+          <?php endif; ?>
+          <?php if ($overdue_infant_count > 0): ?>
+          <li><div class="dropdown-item-text notif-item notif-warning"><i class="fa-solid fa-syringe me-2" aria-hidden="true"></i><strong><?= $overdue_infant_count ?> infant<?= $overdue_infant_count > 1 ? 's' : '' ?> overdue</strong> for DOH EPI vaccinations. <a href="../infant/infant.php">View infant monitoring</a></div></li>
+          <?php endif; ?>
+          <?php if ($behind_maternal_count > 0): ?>
+          <li><div class="dropdown-item-text notif-item notif-warning"><i class="fa-solid fa-person-pregnant me-2" aria-hidden="true"></i><strong><?= $behind_maternal_count ?> pregnant resident<?= $behind_maternal_count > 1 ? 's' : '' ?> behind</strong> on prenatal visit schedule. <a href="../maternal/maternal.php">View maternal health</a></div></li>
+          <?php endif; ?>
+        </ul>
+      </div>
       <div class="bhms-topbar-user">
         <i class="fa-regular fa-circle-user"></i>
         <span><?= htmlspecialchars($_SESSION['full_name']) ?></span>
@@ -594,15 +641,12 @@ if (!isset($total_residents)) { return; }
             <td><?= htmlspecialchars($alert['disease_name']) ?></td>
             <td><?= $alert['case_count'] ?></td>
             <td><span class="badge <?= $alert['level'] === 'high' ? 'bg-danger' : 'bg-warning text-dark' ?>"><?= ucfirst($alert['level']) ?></span></td>
-            <td>
-              <div class="dropdown">
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Actions</button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="../heatmap/heatmap.php">View heatmap</a></li>
-                  <li><a class="dropdown-item" href="../announcements/announcements.php?draft_title=<?= urlencode($draft_title) ?>&draft_content=<?= urlencode($draft_content) ?>&draft_purok=<?= urlencode($alert['purok']) ?>">Draft public advisory</a></li>
-                  <li><a class="dropdown-item" href="../reports/lgu_briefing.php?purok=<?= urlencode($alert['purok']) ?>&disease=<?= urlencode($alert['disease_name']) ?>&count=<?= urlencode($alert['case_count']) ?>" target="_blank">Generate LGU briefing (PDF)</a></li>
-                  <li><a class="dropdown-item" href="../admin/notify_lgu.php?purok=<?= urlencode($alert['purok']) ?>&disease=<?= urlencode($alert['disease_name']) ?>&count=<?= urlencode($alert['case_count']) ?>" onclick="return confirm('Send SMS notification to all LGU contacts?')">Notify LGU via SMS</a></li>
-                </ul>
+                        <td>
+              <div class="d-flex gap-1">
+                <a href="../heatmap/heatmap.php" class="btn btn-sm btn-outline-secondary" title="View heatmap"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i></a>
+                <a href="../announcements/announcements.php?draft_title=<?= urlencode($draft_title) ?>&draft_content=<?= urlencode($draft_content) ?>&draft_purok=<?= urlencode($alert['purok']) ?>" class="btn btn-sm btn-outline-secondary" title="Draft public advisory"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></a>
+                <a href="../reports/lgu_briefing.php?purok=<?= urlencode($alert['purok']) ?>&disease=<?= urlencode($alert['disease_name']) ?>&count=<?= urlencode($alert['case_count']) ?>" target="_blank" class="btn btn-sm btn-outline-secondary" title="Generate LGU briefing (PDF)"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i></a>
+                <button type="button" class="btn btn-sm btn-outline-secondary" title="Notify LGU via SMS" data-notify-url="../admin/notify_lgu.php?purok=<?= urlencode($alert['purok']) ?>&disease=<?= urlencode($alert['disease_name']) ?>&count=<?= urlencode($alert['case_count']) ?>" data-notify-detail="<?= htmlspecialchars($alert['disease_name'] . ' — Purok ' . $alert['purok'] . ' (' . $alert['case_count'] . ' cases)') ?>" onclick="openNotifyModal(this)"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
               </div>
             </td>
           </tr>
@@ -614,23 +658,7 @@ if (!isset($total_residents)) { return; }
   </div>
   <?php endif; ?>
 
-  <?php if (isset($_GET['sms_sent'])): ?>
-  <div class="alert alert-success"><i class="fa-solid fa-circle-check me-2"></i><?= (int) $_GET['sms_sent'] ?> SMS notification(s) sent to LGU contacts (simulated).</div>
-  <?php endif; ?>
-
-  <?php if ($overdue_infant_count > 0): ?>
-  <div class="alert alert-warning">
-    <i class="fa-solid fa-syringe me-2"></i><strong><?= $overdue_infant_count ?> infant<?= $overdue_infant_count > 1 ? 's' : '' ?> overdue</strong> for DOH EPI vaccinations.
-    <a href="../infant/infant.php">View infant monitoring</a>
-  </div>
-  <?php endif; ?>
-
-  <?php if ($behind_maternal_count > 0): ?>
-  <div class="alert alert-warning">
-    <i class="fa-solid fa-person-pregnant me-2"></i><strong><?= $behind_maternal_count ?> pregnant resident<?= $behind_maternal_count > 1 ? 's' : '' ?> behind</strong> on prenatal visit schedule.
-    <a href="../maternal/maternal.php">View maternal health</a>
-  </div>
-  <?php endif; ?>
+  
 
   <?php if (!empty($seasonal_advisories)): ?>
   <div class="card mb-4">
@@ -654,14 +682,32 @@ if (!isset($total_residents)) { return; }
   </div>
   <?php endif; ?>
 
-
+  <div class="modal fade" id="notifyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body p-4 text-center">
+          <div class="mb-3" style="width:56px;height:56px;border-radius:50%;background:var(--bhms-blue-light);display:flex;align-items:center;justify-content:center;margin:0 auto;">
+            <i class="fa-solid fa-paper-plane" style="color:var(--bhms-blue);font-size:1.4rem;" aria-hidden="true"></i>
+          </div>
+          <h5 class="mb-2">Send SMS notification?</h5>
+          <p class="text-muted small mb-3">This will notify all LGU contacts on file about:</p>
+          <p class="fw-bold mb-4" id="notifyModalDetail"></p>
+          <div class="d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+            <a href="#" id="notifyModalConfirm" class="btn btn-primary btn-sm"><i class="fa-solid fa-paper-plane me-1" aria-hidden="true"></i>Send notification</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="row g-3 mb-3 dashboard-lower-row">
     <?php if (!empty($disease_trends)): ?>
     <div class="col-lg-6">
       <div class="card h-100 mb-0">
         <div class="card-body">
           <h5 class="card-title"><i class="fa-solid fa-arrow-trend-up me-2"></i>Disease trend indicators <small class="text-muted">(month-over-month, based on recorded cases)</small></h5>
-          <div class="dashboard-trend-scroll">
+                    <div class="dashboard-trend-scroll">
+          <div class="table-responsive">
           <table class="table table-sm mb-0">
             <thead><tr><th>Disease</th><th>Trend</th></tr></thead>
             <tbody>
@@ -671,8 +717,9 @@ if (!isset($total_residents)) { return; }
                 <td><span class="badge bg-<?= $trend['badge'] ?>"><?= htmlspecialchars($trend['label']) ?></span></td>
               </tr>
               <?php endforeach; ?>
-            </tbody>
+                        </tbody>
           </table>
+          </div>
           </div>
         </div>
       </div>
@@ -756,6 +803,16 @@ document.querySelectorAll('.bhms-nav-link').forEach(function (link) {
     if (cb) { cb.checked = false; }
   });
 });
+
+let notifyModalInstance = null;
+function openNotifyModal(btn) {
+    document.getElementById('notifyModalDetail').innerText = btn.dataset.notifyDetail;
+    document.getElementById('notifyModalConfirm').href = btn.dataset.notifyUrl;
+    if (!notifyModalInstance) {
+        notifyModalInstance = new bootstrap.Modal(document.getElementById('notifyModal'));
+    }
+    notifyModalInstance.show();
+}
 </script>
 </body>
 </html>

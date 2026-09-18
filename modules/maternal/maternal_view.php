@@ -12,6 +12,7 @@ if (!isset($records)) { return; }
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="../../assets/images/barangay_logo.png">
 <title>Maternal Health Monitoring</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -76,7 +77,7 @@ if (!isset($records)) { return; }
   }
   .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
-  .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
+  .bhms-brand-sub { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
   .bhms-nav-link {
     display: flex; align-items: center; gap: 0.75rem; padding: 0.62rem 0.9rem; margin-bottom: 0.2rem;
@@ -258,8 +259,8 @@ if (!isset($records)) { return; }
     <div class="bhms-sidebar-brand">
       <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
-        <span class="bhms-brand-title">Barangay Santa Ines</span>
-        <span class="bhms-brand-sub">Health Monitoring System</span>
+        <span class="bhms-brand-title">IneSight</span>
+        <span class="bhms-brand-sub">Health Monitoring & Decision Support</span>
       </div>
     </div>
     <nav class="bhms-nav">
@@ -392,9 +393,28 @@ if (!isset($records)) { return; }
   </div>
 
   <h5><i class="fa-solid fa-list-check me-2"></i>All maternal records</h5>
-  <input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Search by name...">
+  <div class="d-flex flex-wrap gap-2 mb-3">
+  <input type="text" id="liveSearch" class="form-control form-control-sm" style="max-width:250px;" placeholder="Search by name...">
+  <select id="filterPurok" class="form-select form-select-sm" style="max-width:150px;">
+    <option value="">All Puroks</option>
+    <option value="Purok 1">Purok 1</option>
+    <option value="Purok 2">Purok 2</option>
+    <option value="Purok 3">Purok 3</option>
+    <option value="Purok 4">Purok 4</option>
+  </select>
+  <select id="filterStatus" class="form-select form-select-sm" style="max-width:180px;">
+    <option value="">All Statuses</option>
+    <option value="Ongoing">Ongoing</option>
+    <option value="High-risk">High-risk</option>
+    <option value="Delivered">Delivered</option>
+    <option value="Postpartum">Postpartum</option>
+    <option value="Referred to RHU">Referred to RHU</option>
+    <option value="Deceased">Deceased</option>
+  </select>
+</div>
   <div class="maternal-table-card">
-  <table class="table table-striped">
+  <div class="table-responsive">
+<table class="table table-striped">
     <thead>
       <tr>
         <th>Name</th><th>Purok</th><th>LMP</th><th>EDD</th><th>Status</th><th>Visit compliance</th><th>Actions</th>
@@ -402,7 +422,7 @@ if (!isset($records)) { return; }
     </thead>
     <tbody>
       <?php foreach ($records as $rec): $compliance = getPrenatalComplianceStatus($pdo, $rec['maternal_record_id'], $rec['lmp_date'], $rec['monitoring_status'], $prenatal_schedule); ?>
-      <tr>
+      <tr data-purok="Purok <?= htmlspecialchars($rec['purok']) ?>" data-status="<?= htmlspecialchars($rec['monitoring_status']) ?>">
         <td><?= htmlspecialchars($rec['last_name'] . ', ' . $rec['first_name']) ?></td>
         <td>Purok <?= htmlspecialchars($rec['purok']) ?></td>
         <td><?= htmlspecialchars($rec['lmp_date']) ?></td>
@@ -417,6 +437,7 @@ if (!isset($records)) { return; }
       <?php endforeach; ?>
     </tbody>
   </table>
+  </div>
   </div>
 </div>
 
@@ -447,13 +468,22 @@ document.querySelector('.card form').addEventListener('submit', function (e) {
 });
 </script>
 <script>
-document.getElementById('liveSearch').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    const rows = document.querySelectorAll('.maternal-table-card tbody tr');
-    rows.forEach(function(row) {
-        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+function applyMaternalFilters() {
+    const query = document.getElementById('liveSearch').value.toLowerCase();
+    const purok = document.getElementById('filterPurok').value;
+    const status = document.getElementById('filterStatus').value;
+
+    document.querySelectorAll('.maternal-table-card tbody tr').forEach(function(row) {
+        const matchesText = row.textContent.toLowerCase().includes(query);
+        const matchesPurok = !purok || row.dataset.purok === purok;
+        const matchesStatus = !status || row.dataset.status === status;
+        row.style.display = (matchesText && matchesPurok && matchesStatus) ? '' : 'none';
     });
-});
+}
+
+document.getElementById('liveSearch').addEventListener('input', applyMaternalFilters);
+document.getElementById('filterPurok').addEventListener('change', applyMaternalFilters);
+document.getElementById('filterStatus').addEventListener('change', applyMaternalFilters);
 </script>
 <script>
 document.getElementById('resident_id').addEventListener('change', function() {

@@ -10,6 +10,7 @@ if (!isset($residents)) { return; }
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="../../assets/images/barangay_logo.png">
 <title>Resident Profiling</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -74,7 +75,7 @@ if (!isset($residents)) { return; }
   }
   .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
-  .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
+  .bhms-brand-sub { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
 
 
@@ -314,8 +315,8 @@ if (!isset($residents)) { return; }
     <div class="bhms-sidebar-brand">
       <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
-        <span class="bhms-brand-title">Barangay Santa Ines</span>
-        <span class="bhms-brand-sub">Health Monitoring System</span>
+        <span class="bhms-brand-title">IneSight</span>
+        <span class="bhms-brand-sub">Health Monitoring & Decision Support</span>
       </div>
     </div>
     <nav class="bhms-nav">
@@ -452,11 +453,32 @@ if (!isset($residents)) { return; }
     </div>
   </div>
 
-<input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Type to search by name...">
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <input type="text" id="liveSearch" class="form-control form-control-sm" style="max-width:250px;" placeholder="Type to search by name...">
+  <select id="filterPurok" class="form-select form-select-sm" style="max-width:150px;">
+    <option value="">All Puroks</option>
+    <option value="Purok 1">Purok 1</option>
+    <option value="Purok 2">Purok 2</option>
+    <option value="Purok 3">Purok 3</option>
+    <option value="Purok 4">Purok 4</option>
+  </select>
+  <select id="filterGender" class="form-select form-select-sm" style="max-width:150px;">
+    <option value="">All Genders</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+  </select>
+  <select id="filterVital" class="form-select form-select-sm" style="max-width:170px;">
+    <option value="">All Residents</option>
+    <option value="alive">Alive Only</option>
+    <option value="Deceased">Deceased Only</option>
+  </select>
+</div>
 
   <h5><i class="fa-solid fa-list-check me-2"></i>All residents</h5>
-  <div class="residents-table-card">
-  <table class="table table-striped">
+    <div class="residents-table-card">
+  <div class="table-responsive">
+  <div class="table-responsive">
+<table class="table table-striped">
     <thead>
       <tr>
         <th>Name</th><th>Birth date</th><th>Gender</th><th>Purok</th><th>Contact</th><th>Actions</th>
@@ -464,7 +486,7 @@ if (!isset($residents)) { return; }
     </thead>
     <tbody>
       <?php foreach ($residents as $r): ?>
-      <tr>
+      <tr data-gender="<?= htmlspecialchars($r['gender']) ?>" data-purok="Purok <?= htmlspecialchars($r['purok']) ?>" data-vital="<?= htmlspecialchars($r['vital_status']) ?>">
         <td><div class="resident-name-cell"><div class="resident-icon"><i class="fa-solid fa-user"></i></div><?= htmlspecialchars($r['last_name'] . ', ' . $r['first_name'] . ' ' . $r['middle_name']) ?><?php if ($r['vital_status'] === 'Deceased'): ?> <span class="badge" style="background:var(--bhms-gray-200);color:var(--bhms-gray-600);">Deceased</span><?php endif; ?></div></td>
         <td><?= htmlspecialchars($r['birth_date']) ?></td>
         <td><?= htmlspecialchars($r['gender']) ?></td>
@@ -484,7 +506,9 @@ if (!isset($residents)) { return; }
       </tr>
       <?php endforeach; ?>
     </tbody>
-  </table>
+    </table>
+  </div>
+  </div>
   </div>
 </div>
 
@@ -522,14 +546,25 @@ function showQr(code, name) {
 }
 </script>
 <script>
-document.getElementById('liveSearch').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    const rows = document.querySelectorAll('table tbody tr');
-    rows.forEach(function(row) {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(query) ? '' : 'none';
+function applyResidentFilters() {
+    const query = document.getElementById('liveSearch').value.toLowerCase();
+    const purok = document.getElementById('filterPurok').value;
+    const gender = document.getElementById('filterGender').value;
+    const vital = document.getElementById('filterVital').value;
+
+    document.querySelectorAll('.residents-table-card tbody tr').forEach(function(row) {
+        const matchesText = row.textContent.toLowerCase().includes(query);
+        const matchesPurok = !purok || row.dataset.purok === purok;
+        const matchesGender = !gender || row.dataset.gender === gender;
+        const matchesVital = !vital || (vital === 'alive' ? row.dataset.vital !== 'Deceased' : row.dataset.vital === vital);
+        row.style.display = (matchesText && matchesPurok && matchesGender && matchesVital) ? '' : 'none';
     });
-});
+}
+
+document.getElementById('liveSearch').addEventListener('input', applyResidentFilters);
+document.getElementById('filterPurok').addEventListener('change', applyResidentFilters);
+document.getElementById('filterGender').addEventListener('change', applyResidentFilters);
+document.getElementById('filterVital').addEventListener('change', applyResidentFilters);
 </script>
 <script>
 document.getElementById('residentForm')?.addEventListener('submit', function () {

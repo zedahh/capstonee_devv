@@ -72,11 +72,17 @@ function getPrenatalComplianceStatus($pdo, $maternal_record_id, $lmp_date, $moni
 
 
 function sendSms($pdo, $phone_number, $message, $purpose, $user_id) {
+    // Normalize 09xxxxxxxxx (as stored/entered everywhere in the system) into
+    // the +639xxxxxxxxx format UniSMS's API expects.
+    $formatted_number = preg_match('/^09[0-9]{9}$/', $phone_number)
+        ? '+63' . substr($phone_number, 1)
+        : $phone_number;
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, 'https://unismsapi.com/api/sms');
     curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-        'recipient' => $phone_number,
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'recipient' => $formatted_number,
         'content' => $message,
         'sender_id' => 'Unisoft'
     ]));

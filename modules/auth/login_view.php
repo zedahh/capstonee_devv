@@ -4,7 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Login - Barangay Santa Ines Health System</title>
+<link rel="icon" type="image/png" href="../../assets/images/barangay_logo.png">
+<title>IneSight | Login</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -141,8 +142,8 @@
       <div class="login-icon-ring">
         <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="login-logo">
       </div>
-      <h4 class="text-center mb-1 login-title">Barangay Santa Ines</h4>
-      <p class="text-center text-muted mb-4 login-subtitle">Health Monitoring System</p>
+      <h4 class="text-center mb-1 login-title">IneSight</h4>
+      <p class="text-center text-muted mb-4 login-subtitle">Barangay Santa Ines Health Monitoring & Decision Support</p>
 
       <?php if ($error): ?>
         <div class="alert alert-danger"><i class="fa-solid fa-circle-exclamation me-2"></i><?= htmlspecialchars($error) ?></div>

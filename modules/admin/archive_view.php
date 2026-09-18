@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="../../assets/images/barangay_logo.png">
 <title>Archive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -106,7 +107,7 @@
   }
   .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
-  .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
+  .bhms-brand-sub { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
   .bhms-nav-link {
     display: flex; align-items: center; gap: 0.75rem; padding: 0.62rem 0.9rem; margin-bottom: 0.2rem;
@@ -268,8 +269,8 @@
     <div class="bhms-sidebar-brand">
       <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
-        <span class="bhms-brand-title">Barangay Santa Ines</span>
-        <span class="bhms-brand-sub">Health Monitoring System</span>
+        <span class="bhms-brand-title">IneSight</span>
+        <span class="bhms-brand-sub">Health Monitoring & Decision Support</span>
       </div>
     </div>
     <nav class="bhms-nav">
@@ -348,17 +349,30 @@
 
       <div class="card">
         <div class="card-body">
-          <p class="text-muted small mb-3">Archived records are hidden from their original module but not permanently deleted. Restore a record to bring it back, or permanently delete it if you're certain it's no longer needed.</p>
+                    <p class="text-muted small mb-3">Archived records are hidden from their original module but not permanently deleted. Restore a record to bring it back, or permanently delete it if you're certain it's no longer needed.</p>
+          <?php if (!empty($archived_items)): ?>
+          <?php $unique_types = array_unique(array_column($archived_items, 'label')); sort($unique_types); ?>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <input type="text" id="liveSearch" class="form-control form-control-sm" style="max-width:250px;" placeholder="Search archived records...">
+            <select id="filterType" class="form-select form-select-sm" style="max-width:190px;">
+              <option value="">All Record Types</option>
+              <?php foreach ($unique_types as $ut): ?>
+                <option value="<?= htmlspecialchars($ut) ?>"><?= htmlspecialchars($ut) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <?php endif; ?>
           <?php if (empty($archived_items)): ?>
             <p class="text-muted text-center py-4 mb-0">The archive is empty. Nothing has been archived yet.</p>
           <?php else: ?>
           <div class="archive-table-card">
           <div class="table-responsive">
-          <table class="table table-striped">
+          <div class="table-responsive">
+<table class="table table-striped">
             <thead><tr><th>Type</th><th>Details</th><th>Archived by</th><th>Archived on</th><th>Actions</th></tr></thead>
             <tbody>
               <?php foreach ($archived_items as $item): ?>
-              <tr>
+              <tr data-type="<?= htmlspecialchars($item['label']) ?>">
                 <td><span class="type-badge"><?= htmlspecialchars($item['label']) ?></span></td>
                 <td><?= $item['description'] ?></td>
                 <td><?= htmlspecialchars($item['archived_by']) ?></td>
@@ -400,6 +414,23 @@
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function applyArchiveFilters() {
+    const searchEl = document.getElementById('liveSearch');
+    const typeEl = document.getElementById('filterType');
+    if (!searchEl) { return; }
+    const query = searchEl.value.toLowerCase();
+    const type = typeEl.value;
+
+    document.querySelectorAll('.archive-table-card tbody tr').forEach(function(row) {
+        const matchesText = row.textContent.toLowerCase().includes(query);
+        const matchesType = !type || row.dataset.type === type;
+        row.style.display = (matchesText && matchesType) ? '' : 'none';
+    });
+}
+document.getElementById('liveSearch')?.addEventListener('input', applyArchiveFilters);
+document.getElementById('filterType')?.addEventListener('change', applyArchiveFilters);
+</script>
 <script>
 document.querySelectorAll('.bhms-nav-link').forEach(function (link) {
   link.addEventListener('click', function () {

@@ -24,8 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $designation = trim($_POST['designation'] ?? '');
     $phone_number = trim($_POST['phone_number'] ?? '');
 
-    if ($contact_name === '' || $phone_number === '') {
+ if ($contact_name === '' || $phone_number === '') {
         $error = 'Name and phone number are required.';
+    } elseif (!preg_match('/^09[0-9]{9}$/', $phone_number)) {
+        $error = 'Phone number must be 11 digits starting with 09 (e.g. 09171234567).';
     } else {
         $stmt = $pdo->prepare("INSERT INTO lgu_contacts (contact_name, designation, phone_number) VALUES (?, ?, ?)");
         $stmt->execute([$contact_name, $designation, $phone_number]);

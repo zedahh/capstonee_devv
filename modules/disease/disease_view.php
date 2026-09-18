@@ -11,6 +11,7 @@ if (!isset($cases)) { return; }
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="../../assets/images/barangay_logo.png">
 <title>Disease and Illness Case Recording</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,7 +76,7 @@ if (!isset($cases)) { return; }
   }
   .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
-  .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
+  .bhms-brand-sub { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
   .bhms-nav-link {
     display: flex; align-items: center; gap: 0.75rem; padding: 0.62rem 0.9rem; margin-bottom: 0.2rem;
@@ -300,8 +301,8 @@ if (!isset($cases)) { return; }
     <div class="bhms-sidebar-brand">
       <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
-        <span class="bhms-brand-title">Barangay Santa Ines</span>
-        <span class="bhms-brand-sub">Health Monitoring System</span>
+        <span class="bhms-brand-title">IneSight</span>
+        <span class="bhms-brand-sub">Health Monitoring & Decision Support</span>
       </div>
     </div>
     <nav class="bhms-nav">
@@ -441,15 +442,33 @@ if (!isset($cases)) { return; }
   </div>
 
   <h5><i class="fa-solid fa-list-check me-2"></i>All disease cases</h5>
-  <input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Search by resident or disease...">
+  <div class="d-flex flex-wrap gap-2 mb-3">
+  <input type="text" id="liveSearch" class="form-control form-control-sm" style="max-width:250px;" placeholder="Search by resident or disease...">
+  <select id="filterPurok" class="form-select form-select-sm" style="max-width:150px;">
+    <option value="">All Puroks</option>
+    <option value="Purok 1">Purok 1</option>
+    <option value="Purok 2">Purok 2</option>
+    <option value="Purok 3">Purok 3</option>
+    <option value="Purok 4">Purok 4</option>
+  </select>
+  <select id="filterStatus" class="form-select form-select-sm" style="max-width:180px;">
+    <option value="">All Statuses</option>
+    <option value="Active">Active</option>
+    <option value="Under monitoring">Under monitoring</option>
+    <option value="Recovered">Recovered</option>
+    <option value="Referred to RHU">Referred to RHU</option>
+    <option value="Deceased">Deceased</option>
+  </select>
+</div>
   <div class="cases-table-card">
-  <table class="table table-striped">
+  <div class="table-responsive">
+<table class="table table-striped">
     <thead>
       <tr><th>Resident</th><th>Purok</th><th>Disease</th><th>Date reported</th><th>Status</th><th>Actions</th></tr>
     </thead>
     <tbody>
       <?php foreach ($cases as $c): ?>
-      <tr>
+      <tr data-purok="Purok <?= htmlspecialchars($c['purok']) ?>" data-status="<?= htmlspecialchars($c['status']) ?>">
         <td><?= htmlspecialchars($c['last_name'] . ', ' . $c['first_name']) ?></td>
         <td>Purok <?= htmlspecialchars($c['purok']) ?></td>
         <td><?= htmlspecialchars($c['disease_name']) ?></td>
@@ -472,15 +491,25 @@ if (!isset($cases)) { return; }
     </tbody>
   </table>
   </div>
+  </div>
 </div>
 <script>
-document.getElementById('liveSearch').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    const rows = document.querySelectorAll('.cases-table-card tbody tr');
-    rows.forEach(function(row) {
-        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+function applyDiseaseFilters() {
+    const query = document.getElementById('liveSearch').value.toLowerCase();
+    const purok = document.getElementById('filterPurok').value;
+    const status = document.getElementById('filterStatus').value;
+
+    document.querySelectorAll('.cases-table-card tbody tr').forEach(function(row) {
+        const matchesText = row.textContent.toLowerCase().includes(query);
+        const matchesPurok = !purok || row.dataset.purok === purok;
+        const matchesStatus = !status || row.dataset.status === status;
+        row.style.display = (matchesText && matchesPurok && matchesStatus) ? '' : 'none';
     });
-});
+}
+
+document.getElementById('liveSearch').addEventListener('input', applyDiseaseFilters);
+document.getElementById('filterPurok').addEventListener('change', applyDiseaseFilters);
+document.getElementById('filterStatus').addEventListener('change', applyDiseaseFilters);
 </script>
 <script>
 document.getElementById('case_resident_id').addEventListener('change', function() {

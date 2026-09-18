@@ -11,6 +11,7 @@ if (!isset($records)) { return; }
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="../../assets/images/barangay_logo.png">
 <title>Vaccination Records</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,7 +74,7 @@ if (!isset($records)) { return; }
   }
   .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
-  .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
+  .bhms-brand-sub { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
   .bhms-nav-link {
     display: flex; align-items: center; gap: 0.75rem; padding: 0.62rem 0.9rem; margin-bottom: 0.2rem;
@@ -250,8 +251,8 @@ if (!isset($records)) { return; }
     <div class="bhms-sidebar-brand">
       <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
-        <span class="bhms-brand-title">Barangay Santa Ines</span>
-        <span class="bhms-brand-sub">Health Monitoring System</span>
+        <span class="bhms-brand-title">IneSight</span>
+        <span class="bhms-brand-sub">Health Monitoring & Decision Support</span>
       </div>
     </div>
     <nav class="bhms-nav">
@@ -366,15 +367,31 @@ if (!isset($records)) { return; }
   </div>
 
   <h5><i class="fa-solid fa-list-check me-2"></i>All vaccination records</h5>
-  <input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Search by infant name...">
+  <div class="d-flex flex-wrap gap-2 mb-3">
+  <input type="text" id="liveSearch" class="form-control form-control-sm" style="max-width:250px;" placeholder="Search by infant name...">
+  <select id="filterPurok" class="form-select form-select-sm" style="max-width:150px;">
+    <option value="">All Puroks</option>
+    <option value="Purok 1">Purok 1</option>
+    <option value="Purok 2">Purok 2</option>
+    <option value="Purok 3">Purok 3</option>
+    <option value="Purok 4">Purok 4</option>
+  </select>
+  <select id="filterVaccine" class="form-select form-select-sm" style="max-width:220px;">
+    <option value="">All Vaccines</option>
+    <?php foreach ($epi_vaccines as $v): ?>
+      <option value="<?= htmlspecialchars($v) ?>"><?= htmlspecialchars($v) ?></option>
+    <?php endforeach; ?>
+  </select>
+</div>
   <div class="vaccination-table-card">
-  <table class="table table-striped">
+  <div class="table-responsive">
+<table class="table table-striped">
     <thead>
       <tr><th>Infant</th><th>Purok</th><th>Vaccine</th><th>Date given</th><th>Given by</th><th>Notes</th><th>Actions</th></tr>
     </thead>
     <tbody>
       <?php foreach ($records as $rec): ?>
-      <tr>
+      <tr data-purok="Purok <?= htmlspecialchars($rec['purok']) ?>" data-vaccine="<?= htmlspecialchars($rec['vaccine_name']) ?>">
         <td><?= htmlspecialchars($rec['last_name'] . ', ' . $rec['first_name']) ?></td>
         <td>Purok <?= htmlspecialchars($rec['purok']) ?></td>
         <td><div class="vaccine-name-cell"><div class="vaccine-icon"><i class="fa-solid fa-syringe"></i></div><?= htmlspecialchars($rec['vaccine_name']) ?></div></td>
@@ -387,15 +404,25 @@ if (!isset($records)) { return; }
     </tbody>
   </table>
   </div>
+  </div>
 </div>
 <script>
-document.getElementById('liveSearch').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    const rows = document.querySelectorAll('.vaccination-table-card tbody tr');
-    rows.forEach(function(row) {
-        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+function applyVaccinationFilters() {
+    const query = document.getElementById('liveSearch').value.toLowerCase();
+    const purok = document.getElementById('filterPurok').value;
+    const vaccine = document.getElementById('filterVaccine').value;
+
+    document.querySelectorAll('.vaccination-table-card tbody tr').forEach(function(row) {
+        const matchesText = row.textContent.toLowerCase().includes(query);
+        const matchesPurok = !purok || row.dataset.purok === purok;
+        const matchesVaccine = !vaccine || row.dataset.vaccine === vaccine;
+        row.style.display = (matchesText && matchesPurok && matchesVaccine) ? '' : 'none';
     });
-});
+}
+
+document.getElementById('liveSearch').addEventListener('input', applyVaccinationFilters);
+document.getElementById('filterPurok').addEventListener('change', applyVaccinationFilters);
+document.getElementById('filterVaccine').addEventListener('change', applyVaccinationFilters);
 </script>
 <script>
 document.getElementById('vaccinationForm')?.addEventListener('submit', function () {

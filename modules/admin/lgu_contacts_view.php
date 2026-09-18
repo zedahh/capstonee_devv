@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="../../assets/images/barangay_logo.png">
 <title>LGU Contacts</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -67,7 +68,7 @@
   }
   .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
-  .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
+  .bhms-brand-sub { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
   .bhms-nav-link {
     display: flex; align-items: center; gap: 0.75rem; padding: 0.62rem 0.9rem; margin-bottom: 0.2rem;
@@ -217,8 +218,8 @@
     <div class="bhms-sidebar-brand">
       <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
-        <span class="bhms-brand-title">Barangay Santa Ines</span>
-        <span class="bhms-brand-sub">Health Monitoring System</span>
+        <span class="bhms-brand-title">IneSight</span>
+        <span class="bhms-brand-sub">Health Monitoring & Decision Support</span>
       </div>
     </div>
     <nav class="bhms-nav">
@@ -276,9 +277,9 @@
             <label class="form-label">Designation</label>
             <input type="text" name="designation" class="form-control" placeholder="e.g. Punong Barangay">
           </div>
-          <div class="col-md-4">
+            <div class="col-md-4">
             <label class="form-label">Phone number</label>
-            <input type="text" name="phone_number" class="form-control" placeholder="09XXXXXXXXX" required>
+            <input type="text" name="phone_number" class="form-control" pattern="09[0-9]{9}" maxlength="11" inputmode="numeric" placeholder="09XXXXXXXXX" title="Enter an 11-digit mobile number starting with 09" required>
           </div>
         </div>
         <button type="submit" class="btn btn-primary mt-3"><i class="fa-solid fa-plus me-2"></i>Add contact</button>
@@ -288,7 +289,8 @@
 
   <h5><i class="fa-solid fa-address-card me-2"></i>Current contacts</h5>
   <div class="contacts-table-card">
-  <table class="table table-striped">
+  <div class="table-responsive">
+<table class="table table-striped">
     <thead><tr><th>Name</th><th>Designation</th><th>Phone</th><th>Actions</th></tr></thead>
     <tbody>
       <?php foreach ($contacts as $c): ?>
@@ -301,6 +303,7 @@
       <?php endforeach; ?>
     </tbody>
   </table>
+  </div>
   </div>
 </div>
     </main>

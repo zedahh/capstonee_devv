@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="../../assets/images/barangay_logo.png">
 <title>Audit Log</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -102,7 +103,7 @@
 }
   .bhms-sidebar-brand img.brand-logo { object-fit: cover; border-radius: 50%; padding: 2px; }
   .bhms-brand-title { display: block; font-weight: 600; font-size: 0.95rem; line-height: 1.25; }
-  .bhms-brand-sub { display: block; font-size: 0.72rem; opacity: 0.78; line-height: 1.2; }
+  .bhms-brand-sub { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.2; }
   .bhms-nav { flex: 1 1 auto; overflow-y: auto; padding: 1rem 0.75rem; }
   .bhms-nav-link {
     display: flex; align-items: center; gap: 0.75rem; padding: 0.62rem 0.9rem; margin-bottom: 0.2rem;
@@ -195,8 +196,8 @@
     <div class="bhms-sidebar-brand">
       <img src="../../assets/images/barangay_logo.png" alt="Barangay Santa Ines Seal" class="brand-logo">
       <div>
-        <span class="bhms-brand-title">Barangay Santa Ines</span>
-        <span class="bhms-brand-sub">Health Monitoring System</span>
+        <span class="bhms-brand-title">IneSight</span>
+        <span class="bhms-brand-sub">Health Monitoring & Decision Support</span>
       </div>
     </div>
     <nav class="bhms-nav">
@@ -238,10 +239,31 @@
     <a href="../dashboard/dashboard.php" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
   </div>
 
-  <input type="text" id="liveSearch" class="form-control form-control-sm mb-3" style="max-width:300px;" placeholder="Search by user, action, table, or details...">
+  <?php
+$unique_actions = array_unique(array_column($logs, 'action'));
+sort($unique_actions);
+$unique_tables = array_unique(array_column($logs, 'table_name'));
+sort($unique_tables);
+?>
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <input type="text" id="liveSearch" class="form-control form-control-sm" style="max-width:250px;" placeholder="Search by user, action, table, or details...">
+  <select id="filterAction" class="form-select form-select-sm" style="max-width:170px;">
+    <option value="">All Actions</option>
+    <?php foreach ($unique_actions as $a): ?>
+      <option value="<?= htmlspecialchars($a) ?>"><?= htmlspecialchars($a) ?></option>
+    <?php endforeach; ?>
+  </select>
+  <select id="filterTable" class="form-select form-select-sm" style="max-width:190px;">
+    <option value="">All Tables</option>
+    <?php foreach ($unique_tables as $tbl): ?>
+      <option value="<?= htmlspecialchars($tbl) ?>"><?= htmlspecialchars($tbl) ?></option>
+    <?php endforeach; ?>
+  </select>
+</div>
 
   <div class="audit-table-card">
-  <table class="table table-striped table-sm">
+  <div class="table-responsive">
+<table class="table table-striped table-sm">
     <thead>
       <tr>
         <th>Date/time</th><th>User</th><th>Action</th><th>Table</th><th>Record ID</th><th>Details</th>
@@ -249,7 +271,7 @@
     </thead>
     <tbody>
       <?php foreach ($logs as $log): ?>
-      <tr>
+      <tr data-action="<?= htmlspecialchars($log['action']) ?>" data-table="<?= htmlspecialchars($log['table_name']) ?>">
         <td><?= htmlspecialchars($log['created_at']) ?></td>
         <td><?= htmlspecialchars($log['full_name'] ?? 'Unknown') ?></td>
         <td><?= htmlspecialchars($log['action']) ?></td>
@@ -261,15 +283,25 @@
     </tbody>
   </table>
   </div>
+  </div>
 </div>
 <script>
-document.getElementById('liveSearch').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    const rows = document.querySelectorAll('.audit-table-card tbody tr');
-    rows.forEach(function(row) {
-        row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+function applyAuditFilters() {
+    const query = document.getElementById('liveSearch').value.toLowerCase();
+    const action = document.getElementById('filterAction').value;
+    const table = document.getElementById('filterTable').value;
+
+    document.querySelectorAll('.audit-table-card tbody tr').forEach(function(row) {
+        const matchesText = row.textContent.toLowerCase().includes(query);
+        const matchesAction = !action || row.dataset.action === action;
+        const matchesTable = !table || row.dataset.table === table;
+        row.style.display = (matchesText && matchesAction && matchesTable) ? '' : 'none';
     });
-});
+}
+
+document.getElementById('liveSearch').addEventListener('input', applyAuditFilters);
+document.getElementById('filterAction').addEventListener('change', applyAuditFilters);
+document.getElementById('filterTable').addEventListener('change', applyAuditFilters);
 </script>
     </main>
   </div>

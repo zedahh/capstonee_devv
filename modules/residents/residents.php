@@ -75,8 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address_line = trim($_POST['address_line'] ?? '');
     $contact_number = trim($_POST['contact_number'] ?? '');
 
-    if ($first_name === '' || $middle_name === '' || $last_name === '' || $birth_date === '' || $gender === '' || $purok === '' || $address_line === '') {
+        if ($first_name === '' || $middle_name === '' || $last_name === '' || $birth_date === '' || $gender === '' || $purok === '' || $address_line === '') {
         $error = 'Please fill in all required fields: first name, middle name, last name, birth date, gender, purok, and address.';
+    } elseif ($contact_number !== '' && !preg_match('/^09[0-9]{9}$/', $contact_number)) {
+        $error = 'Contact number must be 11 digits starting with 09 (e.g. 09171234567).';
     } elseif ($resident_id !== '') {
         $stmt = $pdo->prepare("UPDATE residents SET first_name=?, middle_name=?, last_name=?, suffix=?, birth_date=?, gender=?, purok=?, address_line=?, contact_number=? WHERE resident_id=?");
         $stmt->execute([$first_name, $middle_name, $last_name, $suffix, $birth_date, $gender, $purok, $address_line, $contact_number, $resident_id]);

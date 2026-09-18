@@ -22,8 +22,18 @@ $log->execute([$_SESSION['user_id'], "LGU briefing generated: $disease in Purok 
 $today = date('F j, Y');
 $prepared_by = htmlspecialchars($_SESSION['full_name']);
 
+$logo_path = __DIR__ . '/../../assets/images/barangay_logo.png';
+
 $html = "
-<h3>Barangay Santa Ines Health Center</h3>
+<table width='100%' style='border:none; margin-bottom: 6px;'>
+<tr>
+<td width='70' style='vertical-align: middle; border: none;'><img src='$logo_path' width='60'></td>
+<td style='vertical-align: middle; border: none;'>
+<h3 style='margin-bottom: 2px;'>Barangay Santa Ines Health Center</h3>
+<p style='margin: 0; font-size: 10px;'>Plaridel, Bulacan</p>
+</td>
+</tr>
+</table>
 <p><strong>Health Advisory Memorandum</strong></p>
 <hr>
 <p><strong>To:</strong> The Punong Barangay and Barangay Council, Barangay Santa Ines, Plaridel, Bulacan<br>

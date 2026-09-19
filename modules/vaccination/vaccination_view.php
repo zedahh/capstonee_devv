@@ -269,10 +269,13 @@ if (!isset($records)) { return; }
       <div class="bhms-nav-divider">Admin</div>
       <a href="../admin/audit_log.php" class="bhms-nav-link"><i class="fa-solid fa-clipboard-list"></i><span>Audit Log</span></a>
       <a href="../admin/lgu_contacts.php" class="bhms-nav-link"><i class="fa-solid fa-address-book"></i><span>LGU Contacts</span></a>
+      <a href="../admin/user_management.php" class="bhms-nav-link"><i class="fa-solid fa-user-gear"></i><span>User Management</span></a>
       <a href="../admin/archive.php" class="bhms-nav-link"><i class="fa-solid fa-box-archive"></i><span>Archive</span></a>
       <?php endif; ?>
     </nav>
     <div class="bhms-sidebar-footer">
+      <div class="bhms-nav-divider">Account</div>
+      <a href="../auth/my_account.php" class="bhms-nav-link"><i class="fa-solid fa-user-gear"></i><span>My Account</span></a>
       <a href="../auth/logout.php" class="bhms-nav-link bhms-logout-link"><i class="fa-solid fa-right-from-bracket"></i><span>Log out</span></a>
     </div>
   </aside>

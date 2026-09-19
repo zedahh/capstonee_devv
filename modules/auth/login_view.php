@@ -179,7 +179,8 @@
         <span><i class="fa-solid fa-map-location-dot"></i>Purok-level privacy</span>
       </div>
 
-      <p class="text-center mt-4 mb-0 login-record-link"><a href="../residents/my_record.php"><i class="fa-solid fa-id-card me-1"></i> Resident? Check your own health record here</a></p>
+            <p class="text-center mt-4 mb-0 login-record-link"><a href="../residents/my_record.php"><i class="fa-solid fa-id-card me-1"></i> Resident? Check your own health record here</a></p>
+      <p class="text-center mt-2 mb-0" style="font-size: 0.8rem; color: #9CA6AD;">Forgot your password? Please contact your system administrator.</p>
     </div>
   </div>
 </div>
